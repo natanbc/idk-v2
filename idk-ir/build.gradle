@@ -1,0 +1,4 @@
+dependencies {
+    compile project(':idk-ast')
+    compile project(':idk-common')
+}

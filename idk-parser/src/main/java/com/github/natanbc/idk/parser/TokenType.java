@@ -1,0 +1,13 @@
+package com.github.natanbc.idk.parser;
+
+import com.github.natanbc.pratt.TokenKind;
+
+public enum TokenType implements TokenKind {
+    EOF, BOOLEAN, NIL, LONG, DOUBLE, STRING, IDENTIFIER,
+    LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET, RIGHT_BRACKET,
+    LEFT_PAREN, RIGHT_PAREN, PLUS, MINUS, ASTERISK, SLASH,
+    PERCENT, CARET, COMMA, DOT, VARARGS, EQ, NEQ, ASSIGN,
+    NEGATION, GREATER, GREATER_EQ, SMALLER, SMALLER_EQ,
+    AND, OR, IF, WHILE, ELSE, FUNCTION, RETURN, LET, GLOBAL,
+    THROW, ASYNC, AWAIT
+}

@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+allprojects {
+    apply plugin: 'java'
+
+    group 'com.github.natanbc'
+    version '1.0-SNAPSHOT'
+
+    sourceCompatibility = 11
+
+
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+}
+
+dependencies {
+    compile project(':idk-common')
+    compile project(':idk-ast')
+    compile project(':idk-parser')
+    compile project(':idk-ir')
+    compile project(':idk-runtime')
+    compile project(':idk-interpreter')
+    compile project(':idk-stdlib')
+}

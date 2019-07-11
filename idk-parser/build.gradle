@@ -1,0 +1,5 @@
+dependencies {
+    compile project(':idk-common')
+    compile project(':idk-ast')
+    compile 'com.github.natanbc:pratt-parser:1.4.0'
+}
