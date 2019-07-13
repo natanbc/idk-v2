@@ -17,7 +17,6 @@ import com.github.natanbc.idk.ir.variable.IrAssign;
 import com.github.natanbc.idk.ir.variable.IrGlobal;
 import com.github.natanbc.idk.ir.variable.IrMember;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -67,7 +66,7 @@ class ActualIrConverter implements AstVisitor<IrNode> {
     public IrNode visitObjectLiteral(AstObjectLiteral node) {
         var r = new ArrayList<Map.Entry<IrNode, IrNode>>(node.getEntries().size());
         for(var v : node.getEntries()) {
-            r.add(new AbstractMap.SimpleImmutableEntry<>(
+            r.add(Map.entry(
                     v.getKey().accept(innerScope()),
                     v.getValue().accept(innerScope())
             ));
@@ -86,6 +85,11 @@ class ActualIrConverter implements AstVisitor<IrNode> {
     }
     
     @Override
+    public IrNode visitRange(AstRange node) {
+        return new IrRange(node.getFrom().accept(innerScope()), node.getTo().accept(innerScope()));
+    }
+    
+    @Override
     public IrNode visitIdentifier(AstIdentifier node) {
         return scope.find(node.getName());
     }
@@ -97,21 +101,17 @@ class ActualIrConverter implements AstVisitor<IrNode> {
     
     @Override
     public IrNode visitLet(AstLet node) {
-        scope.declareLocal(node.getName());
-        return new IrAssign(scope.find(node.getName()), new IrNil());
+        return new IrAssign(scope.declareLocal(node.getName()), new IrNil());
     }
     
     @Override
     public IrNode visitAssign(AstAssign node) {
         if(node.getTarget() instanceof AstLet) {
             var name = ((AstLet) node.getTarget()).getName();
-            scope.declareLocal(name);
-            return new IrAssign(scope.find(name), node.getValue().accept(innerScope()));
+            return new IrAssign(scope.declareLocal(name), node.getValue().accept(innerScope()));
         }
         if(node.getTarget() instanceof AstObjectLiteral) {
-            var name = uniqueKey(node.getValue());
-            scope.declareLocal(name);
-            var loadNode = scope.find(name);
+            var loadNode = scope.declareLocal(uniqueKey(node.getValue()));
             var b = new ArrayList<IrNode>();
             b.add(new IrAssign(loadNode, node.getValue().accept(innerScope())));
             for(var entry : ((AstObjectLiteral) node.getTarget()).getEntries()) {
@@ -121,9 +121,7 @@ class ActualIrConverter implements AstVisitor<IrNode> {
             return new IrBody(b);
         }
         if(node.getTarget() instanceof AstArrayLiteral) {
-            var name = uniqueKey(node.getValue());
-            scope.declareLocal(name);
-            var loadNode = scope.find(name);
+            var loadNode = scope.declareLocal(uniqueKey(node.getValue()));
             var b = new ArrayList<IrNode>();
             b.add(new IrAssign(loadNode, node.getValue().accept(innerScope())));
             var i = 0;
@@ -190,6 +188,16 @@ class ActualIrConverter implements AstVisitor<IrNode> {
     }
     
     @Override
+    public IrNode visitFor(AstFor node) {
+        var s = innerScope();
+        return new IrFor(
+                s.scope.declareLocal(node.getVariableName()).getIndex(),
+                node.getValue().accept(innerScope()),
+                node.getBody().accept(s)
+        );
+    }
+    
+    @Override
     public IrNode visitReturn(AstReturn node) {
         return new IrReturn(node.getValue().accept(innerScope()));
     }
@@ -210,14 +218,11 @@ class ActualIrConverter implements AstVisitor<IrNode> {
             if(name.equals("_")) {
                 return new IrNil();
             } else {
-                scope.declareLocal(name);
-                return new IrAssign(scope.find(name), value);
+                return new IrAssign(scope.declareLocal(name), value);
             }
         }
         if(destination instanceof AstObjectLiteral) {
-            var name = uniqueKey(destination);
-            scope.declareLocal(name);
-            var loadNode = scope.find(name);
+            var loadNode = scope.declareLocal(uniqueKey(destination));
             var b = new ArrayList<IrNode>();
             b.add(new IrAssign(loadNode, value));
             for(var entry : ((AstObjectLiteral) destination).getEntries()) {
@@ -227,9 +232,7 @@ class ActualIrConverter implements AstVisitor<IrNode> {
             return new IrBody(b);
         }
         if(destination instanceof AstArrayLiteral) {
-            var name = uniqueKey(destination);
-            scope.declareLocal(name);
-            var loadNode = scope.find(name);
+            var loadNode = scope.declareLocal(uniqueKey(destination));
             var b = new ArrayList<IrNode>();
             b.add(new IrAssign(loadNode, value));
             var i = 0;

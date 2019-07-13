@@ -71,6 +71,14 @@ public interface Value {
         throw Helpers.typeError("not an array");
     }
     
+    default boolean isRange() {
+        return false;
+    }
+    
+    default RangeValue asRange() {
+        throw Helpers.typeError("not a range");
+    }
+    
     default Value add(Value other) {
         throw Helpers.invalidArithmetic(this, other);
     }
@@ -104,26 +112,26 @@ public interface Value {
     }
     
     default Value eq(Value other) {
-        return BooleanValue.of(false);
+        return BooleanValue.of(equals(other));
     }
     
     default Value neq(Value other) {
         return eq(other).negate();
     }
     
-    default Value greater(Value other) {
+    default BooleanValue greater(Value other) {
         throw Helpers.typeError(this, "compare", other);
     }
     
-    default Value greaterEq(Value other) {
+    default BooleanValue greaterEq(Value other) {
         throw Helpers.typeError(this, "compare", other);
     }
     
-    default Value smaller(Value other) {
+    default BooleanValue smaller(Value other) {
         throw Helpers.typeError(this, "compare", other);
     }
     
-    default Value smallerEq(Value other) {
+    default BooleanValue smallerEq(Value other) {
         throw Helpers.typeError(this, "compare", other);
     }
     
@@ -139,7 +147,7 @@ public interface Value {
         throw Helpers.typeError(this, "get length of", null);
     }
     
-    default Value keys() {
+    default ArrayValue keys() {
         throw Helpers.typeError(this, "get keys of", null);
     }
 }

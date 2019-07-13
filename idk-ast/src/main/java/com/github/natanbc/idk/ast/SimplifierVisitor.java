@@ -7,7 +7,6 @@ import com.github.natanbc.idk.ast.value.*;
 import com.github.natanbc.idk.ast.variable.*;
 import com.github.natanbc.idk.common.UnaryOperationType;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,7 @@ public class SimplifierVisitor implements AstVisitor<AstNode> {
     public AstNode visitObjectLiteral(AstObjectLiteral node) {
         var ret = new ArrayList<Map.Entry<AstNode, AstNode>>(node.getEntries().size());
         for(var n : node.getEntries()) {
-            ret.add(new AbstractMap.SimpleImmutableEntry<>(
+            ret.add(Map.entry(
                     n.getKey().accept(SIMPLIFY_INTERNAL),
                     n.getValue().accept(SIMPLIFY_INTERNAL)
             ));
@@ -117,6 +116,11 @@ public class SimplifierVisitor implements AstVisitor<AstNode> {
     }
     
     @Override
+    public AstNode visitRange(AstRange node) {
+        return new AstRange(node.getFrom().accept(SIMPLIFY_INTERNAL), node.getTo().accept(SIMPLIFY_INTERNAL));
+    }
+    
+    @Override
     public AstNode visitIdentifier(AstIdentifier node) {
         return node;
     }
@@ -133,7 +137,7 @@ public class SimplifierVisitor implements AstVisitor<AstNode> {
     
     @Override
     public AstNode visitAssign(AstAssign node) {
-        return node;
+        return new AstAssign(node.getTarget().accept(SIMPLIFY_INTERNAL), node.getValue().accept(SIMPLIFY_INTERNAL));
     }
     
     //TODO
@@ -212,6 +216,15 @@ public class SimplifierVisitor implements AstVisitor<AstNode> {
         } else {
             return node;
         }
+    }
+    
+    @Override
+    public AstNode visitFor(AstFor node) {
+        return new AstFor(
+                node.getVariableName(),
+                node.getValue().accept(SIMPLIFY_INTERNAL),
+                node.getBody().accept(SIMPLIFY_INTERNAL)
+        );
     }
     
     @Override

@@ -58,11 +58,6 @@ public class ArrayValue implements Value {
     }
     
     @Override
-    public Value eq(Value other) {
-        return BooleanValue.of(equals(other));
-    }
-    
-    @Override
     public Value get(Value key) {
         return array.get(index(key), NilValue.instance());
     }

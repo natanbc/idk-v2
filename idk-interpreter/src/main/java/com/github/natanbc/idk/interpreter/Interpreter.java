@@ -79,6 +79,11 @@ public class Interpreter implements IrVisitor<Value> {
     }
     
     @Override
+    public Value visitRange(IrRange node) {
+        throw new UnsupportedOperationException("Only root nodes can be directly executed");
+    }
+    
+    @Override
     public Value visitLocal(IrLocal node) {
         throw new UnsupportedOperationException("Only root nodes can be directly executed");
     }
@@ -125,6 +130,11 @@ public class Interpreter implements IrVisitor<Value> {
     
     @Override
     public Value visitWhile(IrWhile node) {
+        throw new UnsupportedOperationException("Only root nodes can be directly executed");
+    }
+    
+    @Override
+    public Value visitFor(IrFor node) {
         throw new UnsupportedOperationException("Only root nodes can be directly executed");
     }
     

@@ -34,6 +34,21 @@ public class IdkParselets {
             Map.entry(TokenType.SMALLER_EQ, new BinaryOperatorParselet(Precedence.CONDITIONAL, BinaryOperationType.SMALLER_EQ)),
             Map.entry(TokenType.AND, new BinaryOperatorParselet(Precedence.CONJUNCTION, BinaryOperationType.AND)),
             Map.entry(TokenType.OR, new BinaryOperatorParselet(Precedence.DISJUNCTION, BinaryOperationType.OR)),
+            Map.entry(TokenType.RANGE, new InfixParselet<>() {
+                @Nonnegative
+                @CheckReturnValue
+                @Override
+                public int precedence() {
+                    return Precedence.RANGE;
+                }
+    
+                @CheckReturnValue
+                @Nonnull
+                @Override
+                public AstNode parse(Void context, @Nonnull Parser<Void, AstNode> parser, @Nonnull AstNode left, @Nonnull Token token) {
+                    return new AstRange(left, parser.parseExpression(context, Precedence.RANGE));
+                }
+            }),
             Map.entry(TokenType.LEFT_PAREN, new InfixParselet<>() {
                 @Nonnegative
                 @CheckReturnValue
@@ -169,7 +184,9 @@ public class IdkParselets {
                 return new AstArrayLiteral(l);
             }),
             Map.entry(TokenType.IF, (context, parser, __1) -> {
+                parser.expect(TokenType.LEFT_PAREN);
                 var cond = parser.parseExpression(context);
+                parser.expect(TokenType.RIGHT_PAREN);
                 var ifTrue = parseBody(context, parser);
                 if(parser.matches(TokenType.ELSE)) {
                     return new AstIf(cond, ifTrue, parseBody(context, parser));
@@ -178,13 +195,24 @@ public class IdkParselets {
                 }
             }),
             Map.entry(TokenType.WHILE, (context, parser, __1) -> {
+                parser.expect(TokenType.LEFT_PAREN);
                 var cond = parser.parseExpression(context);
+                parser.expect(TokenType.RIGHT_PAREN);
                 var body = parseBody(context, parser);
                 if(parser.matches(TokenType.ELSE)) {
                     return new AstWhile(cond, body, parseBody(context, parser));
                 } else {
                     return new AstWhile(cond, body, new AstBody(Collections.emptyList()));
                 }
+            }),
+            Map.entry(TokenType.FOR, (context, parser, __1) -> {
+                parser.expect(TokenType.LEFT_PAREN);
+                var name = parser.consume(TokenType.IDENTIFIER).value();
+                parser.expect(TokenType.IN);
+                var value = parser.parseExpression(context);
+                parser.expect(TokenType.RIGHT_PAREN);
+                var body = parseBody(context, parser);
+                return new AstFor(name, value, body);
             }),
             Map.entry(TokenType.FUNCTION, (context, parser, __1) -> {
                 var annotations = new ArrayList<String>();

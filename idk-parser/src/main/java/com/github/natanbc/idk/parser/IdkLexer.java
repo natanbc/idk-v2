@@ -46,10 +46,9 @@ public class IdkLexer extends Lexer {
                 var p = pos();
                 if(eat('.')) {
                     if(eat('.')) {
-                        System.out.println("emitting varargs");
                         return new Token(TokenType.VARARGS, p, "...");
                     } else {
-                        throw new IllegalArgumentException("Unexpected .. (did you mean ...?):\n" + prettyContext(p, 5));
+                        return new Token(TokenType.RANGE, p, "..");
                     }
                 } else {
                     return new Token(TokenType.DOT, p, ".");
@@ -211,6 +210,8 @@ public class IdkLexer extends Lexer {
             case "throw": return new Token(TokenType.THROW, pos, "throw");
             //case "async": return new Token(TokenType.ASYNC, pos, "async");
             //case "await": return new Token(TokenType.AWAIT, pos, "await");
+            case "for": return new Token(TokenType.FOR, pos, "for");
+            case "in": return new Token(TokenType.IN, pos, "in");
             
             default: return new Token(TokenType.IDENTIFIER, pos, res);
         }
@@ -231,10 +232,11 @@ public class IdkLexer extends Lexer {
                             return new Token(TokenType.DOUBLE, pos, sb.toString());
                         }
                         if(!Character.isDigit(peek(false))) {
-                            back();
+                            unread('.');
                             return new Token(TokenType.LONG, pos, sb.toString());
                         }
                         point = true;
+                        sb.append('.');
                         break;
                     }
                     case '_': break;

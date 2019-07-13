@@ -34,11 +34,12 @@ class FunctionScope {
         return declaredLocals.size();
     }
     
-    void declareLocal(String name) {
+    IrLocal declareLocal(String name) {
         if(outer != null) {
             outer.declareLocal(UNUSED_NAME);
         }
         declaredLocals.add(name);
+        return new IrLocal(declaredLocals.size() - 1);
     }
     
     IrNode find(String name) {
@@ -54,7 +55,7 @@ class FunctionScope {
     }
     
     private IrNode findLocal(String name) {
-        var idx = declaredLocals.indexOf(name);
+        var idx = declaredLocals.lastIndexOf(name);
         if(idx >= 0) {
             return new IrLocal(idx);
         }

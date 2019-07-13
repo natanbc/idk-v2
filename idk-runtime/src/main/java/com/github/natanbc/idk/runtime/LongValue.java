@@ -112,7 +112,7 @@ public class LongValue implements Value {
     }
     
     @Override
-    public Value greater(Value other) {
+    public BooleanValue greater(Value other) {
         if(other.isLong()) {
             return BooleanValue.of(value > other.asLong().getValue());
         } else if(other.isDouble()) {
@@ -123,7 +123,7 @@ public class LongValue implements Value {
     }
     
     @Override
-    public Value greaterEq(Value other) {
+    public BooleanValue greaterEq(Value other) {
         if(other.isLong()) {
             return BooleanValue.of(value >= other.asLong().getValue());
         } else if(other.isDouble()) {
@@ -134,7 +134,7 @@ public class LongValue implements Value {
     }
     
     @Override
-    public Value smaller(Value other) {
+    public BooleanValue smaller(Value other) {
         if(other.isLong()) {
             return BooleanValue.of(value < other.asLong().getValue());
         } else if(other.isDouble()) {
@@ -145,7 +145,7 @@ public class LongValue implements Value {
     }
     
     @Override
-    public Value smallerEq(Value other) {
+    public BooleanValue smallerEq(Value other) {
         if(other.isLong()) {
             return BooleanValue.of(value <= other.asLong().getValue());
         } else if(other.isDouble()) {
@@ -167,6 +167,6 @@ public class LongValue implements Value {
     
     @Override
     public String toString() {
-        return "Long(" + value + ")";
+        return String.valueOf(value);
     }
 }

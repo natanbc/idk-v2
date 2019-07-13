@@ -60,7 +60,7 @@ public abstract class Function implements Value {
     }
     
     @Override
-    public Value keys() {
+    public ArrayValue keys() {
         return new ArrayValue(Collections.singletonList(new StringValue("annotations")));
     }
     

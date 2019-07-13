@@ -27,6 +27,8 @@ public interface IrVisitor<T> {
     
     T visitBinaryOperation(IrBinaryOperation node);
     
+    T visitRange(IrRange node);
+    
     T visitLocal(IrLocal node);
     
     T visitUpvalue(IrUpvalue node);
@@ -46,6 +48,8 @@ public interface IrVisitor<T> {
     T visitIf(IrIf node);
     
     T visitWhile(IrWhile node);
+    
+    T visitFor(IrFor node);
     
     T visitReturn(IrReturn node);
     

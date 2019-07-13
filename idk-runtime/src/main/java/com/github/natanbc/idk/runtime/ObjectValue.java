@@ -33,11 +33,6 @@ public class ObjectValue implements Value {
     }
     
     @Override
-    public Value eq(Value other) {
-        return BooleanValue.of(equals(other));
-    }
-    
-    @Override
     public Value get(Value key) {
         return map.getOrDefault(key, NilValue.instance());
     }
@@ -54,7 +49,7 @@ public class ObjectValue implements Value {
     }
     
     @Override
-    public Value keys() {
+    public ArrayValue keys() {
         return new ArrayValue(map.keySet());
     }
     

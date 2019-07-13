@@ -46,14 +46,7 @@ public class StringValue implements Value {
     }
     
     @Override
-    public Value eq(Value other) {
-        return BooleanValue.of(
-                other.isString() && other.asString().value.equals(value)
-        );
-    }
-    
-    @Override
-    public Value greater(Value other) {
+    public BooleanValue greater(Value other) {
         if(other.isString()) {
             return BooleanValue.of(value.compareTo(other.asString().getValue()) > 0);
         } else {
@@ -62,7 +55,7 @@ public class StringValue implements Value {
     }
     
     @Override
-    public Value greaterEq(Value other) {
+    public BooleanValue greaterEq(Value other) {
         if(other.isString()) {
             return BooleanValue.of(value.compareTo(other.asString().getValue()) >= 0);
         } else {
@@ -71,7 +64,7 @@ public class StringValue implements Value {
     }
     
     @Override
-    public Value smaller(Value other) {
+    public BooleanValue smaller(Value other) {
         if(other.isString()) {
             return BooleanValue.of(value.compareTo(other.asString().getValue()) < 0);
         } else {
@@ -80,7 +73,7 @@ public class StringValue implements Value {
     }
     
     @Override
-    public Value smallerEq(Value other) {
+    public BooleanValue smallerEq(Value other) {
         if(other.isString()) {
             return BooleanValue.of(value.compareTo(other.asString().getValue()) <= 0);
         } else {
@@ -116,6 +109,6 @@ public class StringValue implements Value {
     
     @Override
     public String toString() {
-        return "String(" + value + ")";
+        return value;
     }
 }

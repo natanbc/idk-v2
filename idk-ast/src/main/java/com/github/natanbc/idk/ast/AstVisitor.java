@@ -25,6 +25,8 @@ public interface AstVisitor<T> {
     
     T visitBinaryOperation(AstBinaryOperation node);
     
+    T visitRange(AstRange node);
+    
     T visitIdentifier(AstIdentifier node);
     
     T visitGlobal(AstGlobal node);
@@ -44,6 +46,8 @@ public interface AstVisitor<T> {
     T visitIf(AstIf node);
     
     T visitWhile(AstWhile node);
+    
+    T visitFor(AstFor node);
     
     T visitReturn(AstReturn node);
     

@@ -63,6 +63,11 @@ public class IrConverter implements AstVisitor<IrNode> {
     }
     
     @Override
+    public IrNode visitRange(AstRange node) {
+        return convertAndWrap(node);
+    }
+    
+    @Override
     public IrNode visitIdentifier(AstIdentifier node) {
         return convertAndWrap(node);
     }
@@ -109,6 +114,11 @@ public class IrConverter implements AstVisitor<IrNode> {
     
     @Override
     public IrNode visitWhile(AstWhile node) {
+        return convertAndWrap(node);
+    }
+    
+    @Override
+    public IrNode visitFor(AstFor node) {
         return convertAndWrap(node);
     }
     

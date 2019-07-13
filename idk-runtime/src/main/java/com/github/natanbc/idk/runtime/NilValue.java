@@ -61,6 +61,6 @@ public class NilValue implements Value {
     
     @Override
     public String toString() {
-        return "Nil";
+        return "nil";
     }
 }

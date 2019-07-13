@@ -69,6 +69,11 @@ public class ConstantAnalyzerVisitor implements AstVisitor<Boolean> {
     }
     
     @Override
+    public Boolean visitRange(AstRange node) {
+        return node.getFrom().accept(this) && node.getTo().accept(this);
+    }
+    
+    @Override
     public Boolean visitIdentifier(AstIdentifier node) {
         return true;
     }
@@ -121,6 +126,11 @@ public class ConstantAnalyzerVisitor implements AstVisitor<Boolean> {
     @Override
     public Boolean visitWhile(AstWhile node) {
         return node.getCondition().accept(this) && node.getBody().accept(this) && node.getElseBody().accept(this);
+    }
+    
+    @Override
+    public Boolean visitFor(AstFor node) {
+        return node.getValue().accept(this) && node.getBody().accept(this);
     }
     
     @Override

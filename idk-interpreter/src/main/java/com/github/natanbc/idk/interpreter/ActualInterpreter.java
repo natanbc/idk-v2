@@ -113,6 +113,14 @@ class ActualInterpreter implements IrVisitor<Value> {
     }
     
     @Override
+    public Value visitRange(IrRange node) {
+        return new RangeValue(
+                node.getFrom().accept(this).asLong().getValue(),
+                node.getTo().accept(this).asLong().getValue()
+        );
+    }
+    
+    @Override
     public Value visitLocal(IrLocal node) {
         return state.getLocal(node.getIndex());
     }
@@ -224,6 +232,32 @@ class ActualInterpreter implements IrVisitor<Value> {
             return node.getElseBody().accept(this);
         }
         return ret;
+    }
+    
+    @Override
+    public Value visitFor(IrFor node) {
+        var value = node.getValue().accept(this);
+        if(value.isRange()) {
+            var range = value.asRange();
+            var step = range.getFrom() > range.getTo() ? -1 : 1;
+            Value ret = NilValue.instance();
+            var end = range.getTo() + step;
+            for(var l = range.getFrom(); l != end; l += step) {
+                state.setLocal(node.getVariableIndex(), new LongValue(l));
+                ret = node.getBody().accept(this);
+            }
+            return ret;
+        }
+        if(value.isArray()) {
+            var array = value.asArray();
+            Value ret = NilValue.instance();
+            for(var i = 0; i < array.size(); i++) {
+                state.setLocal(node.getVariableIndex(), array.rawGet(i));
+                ret = node.getBody().accept(this);
+            }
+            return ret;
+        }
+        throw new ThrownError(new StringValue("Bad type as for target: " + value.type()));
     }
     
     @Override

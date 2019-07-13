@@ -75,6 +75,6 @@ public class BooleanValue implements Value {
     
     @Override
     public String toString() {
-        return "Boolean(" + value + ")";
+        return string.getValue();
     }
 }
