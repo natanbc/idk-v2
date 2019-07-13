@@ -4,18 +4,18 @@ import com.github.natanbc.idk.ast.AstNode;
 import com.github.natanbc.idk.ast.AstVisitor;
 
 public class AstFor implements AstNode {
-    private final String variableName;
+    private final AstNode variable;
     private final AstNode value;
     private final AstNode body;
     
-    public AstFor(String variableName, AstNode value, AstNode body) {
-        this.variableName = variableName;
+    public AstFor(AstNode variable, AstNode value, AstNode body) {
+        this.variable = variable;
         this.value = value;
         this.body = body;
     }
     
-    public String getVariableName() {
-        return variableName;
+    public AstNode getVariable() {
+        return variable;
     }
     
     public AstNode getValue() {
@@ -33,7 +33,7 @@ public class AstFor implements AstNode {
     
     @Override
     public int hashCode() {
-        return variableName.hashCode() ^ value.hashCode() ^ body.hashCode();
+        return variable.hashCode() ^ value.hashCode() ^ body.hashCode();
     }
     
     @Override
@@ -42,11 +42,11 @@ public class AstFor implements AstNode {
             return false;
         }
         var o = (AstFor)obj;
-        return o.variableName.equals(variableName) && o.value.equals(value) && o.body.equals(body);
+        return o.variable.equals(variable) && o.value.equals(value) && o.body.equals(body);
     }
     
     @Override
     public String toString() {
-        return "For(" + variableName + ", " + value + ", " + body + ")";
+        return "For(" + variable + ", " + value + ", " + body + ")";
     }
 }

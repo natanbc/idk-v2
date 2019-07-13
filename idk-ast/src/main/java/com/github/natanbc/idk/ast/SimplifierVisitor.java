@@ -221,7 +221,7 @@ public class SimplifierVisitor implements AstVisitor<AstNode> {
     @Override
     public AstNode visitFor(AstFor node) {
         return new AstFor(
-                node.getVariableName(),
+                node.getVariable(),
                 node.getValue().accept(SIMPLIFY_INTERNAL),
                 node.getBody().accept(SIMPLIFY_INTERNAL)
         );

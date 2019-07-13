@@ -207,12 +207,12 @@ public class IdkParselets {
             }),
             Map.entry(TokenType.FOR, (context, parser, __1) -> {
                 parser.expect(TokenType.LEFT_PAREN);
-                var name = parser.consume(TokenType.IDENTIFIER).value();
+                var variable = parser.parseExpression(context);
                 parser.expect(TokenType.IN);
                 var value = parser.parseExpression(context);
                 parser.expect(TokenType.RIGHT_PAREN);
                 var body = parseBody(context, parser);
-                return new AstFor(name, value, body);
+                return new AstFor(variable, value, body);
             }),
             Map.entry(TokenType.FUNCTION, (context, parser, __1) -> {
                 var annotations = new ArrayList<String>();

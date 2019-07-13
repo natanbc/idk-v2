@@ -15,10 +15,12 @@ import com.github.natanbc.idk.ir.operation.IrUnaryOperation;
 import com.github.natanbc.idk.ir.value.*;
 import com.github.natanbc.idk.ir.variable.IrAssign;
 import com.github.natanbc.idk.ir.variable.IrGlobal;
+import com.github.natanbc.idk.ir.variable.IrLocal;
 import com.github.natanbc.idk.ir.variable.IrMember;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 class ActualIrConverter implements AstVisitor<IrNode> {
@@ -189,12 +191,51 @@ class ActualIrConverter implements AstVisitor<IrNode> {
     
     @Override
     public IrNode visitFor(AstFor node) {
-        var s = innerScope();
-        return new IrFor(
-                s.scope.declareLocal(node.getVariableName()).getIndex(),
-                node.getValue().accept(innerScope()),
-                node.getBody().accept(s)
-        );
+        var variable = node.getVariable();
+        IrLocal loadNode;
+        IrNode setup;
+        if(variable instanceof AstObjectLiteral) {
+            loadNode = scope.declareLocal(uniqueKey(variable));
+            var b = new ArrayList<IrNode>();
+            for(var entry : ((AstObjectLiteral) variable).getEntries()) {
+                b.add(destructure(new IrMember(loadNode, entry.getKey().accept(innerScope())), entry.getValue()));
+            }
+            b.add(new IrNil());
+            setup = new IrBody(b);
+        } else if(variable instanceof AstArrayLiteral) {
+            loadNode = scope.declareLocal(uniqueKey(variable));
+            var b = new ArrayList<IrNode>();
+            var i = 0;
+            for(var entry : ((AstArrayLiteral) variable).getValues()) {
+                b.add(destructure(new IrMember(loadNode, new IrLong(i)), entry));
+                i++;
+            }
+            b.add(new IrNil());
+            setup = new IrBody(b);
+        } else if(variable instanceof AstIdentifier) {
+            loadNode = scope.declareLocal(((AstIdentifier) variable).getName());
+            setup = null;
+        } else {
+            loadNode = scope.declareLocal(uniqueKey(variable));
+            setup = new IrIf(
+                    new IrBinaryOperation(BinaryOperationType.NEQ, variable.accept(innerScope()), loadNode),
+                    new IrThrow(new IrString("Pattern " + variable + " didn't match")),
+                    new IrNil()
+            );
+        }
+        if(setup == null) {
+            return new IrFor(
+                    loadNode.getIndex(),
+                    node.getValue().accept(innerScope()),
+                    node.getBody().accept(innerScope())
+            );
+        } else {
+            return new IrFor(
+                    loadNode.getIndex(),
+                    node.getValue().accept(innerScope()),
+                    new IrBody(List.of(setup, node.getBody().accept(innerScope())))
+            );
+        }
     }
     
     @Override
