@@ -9,7 +9,7 @@ import com.github.natanbc.idk.ast.variable.*;
 public class ConstantAnalyzerVisitor implements AstVisitor<Boolean> {
     private static final ConstantAnalyzerVisitor INSTANCE = new ConstantAnalyzerVisitor();
     
-    public static AstVisitor<Boolean> instance() {
+    public static ConstantAnalyzerVisitor instance() {
         return INSTANCE;
     }
     

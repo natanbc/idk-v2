@@ -1,10 +1,12 @@
 package com.github.natanbc.idk.runtime;
 
+import java.util.Objects;
+
 public class StringValue implements Value {
     private final String value;
     
     public StringValue(String value) {
-        this.value = value;
+        this.value = Objects.requireNonNull(value);
     }
     
     public String getValue() {
@@ -46,7 +48,7 @@ public class StringValue implements Value {
     }
     
     @Override
-    public BooleanValue greater(Value other) {
+    public Value greater(Value other) {
         if(other.isString()) {
             return BooleanValue.of(value.compareTo(other.asString().getValue()) > 0);
         } else {
@@ -55,7 +57,7 @@ public class StringValue implements Value {
     }
     
     @Override
-    public BooleanValue greaterEq(Value other) {
+    public Value greaterEq(Value other) {
         if(other.isString()) {
             return BooleanValue.of(value.compareTo(other.asString().getValue()) >= 0);
         } else {
@@ -64,7 +66,7 @@ public class StringValue implements Value {
     }
     
     @Override
-    public BooleanValue smaller(Value other) {
+    public Value smaller(Value other) {
         if(other.isString()) {
             return BooleanValue.of(value.compareTo(other.asString().getValue()) < 0);
         } else {
@@ -73,7 +75,7 @@ public class StringValue implements Value {
     }
     
     @Override
-    public BooleanValue smallerEq(Value other) {
+    public Value smallerEq(Value other) {
         if(other.isString()) {
             return BooleanValue.of(value.compareTo(other.asString().getValue()) <= 0);
         } else {

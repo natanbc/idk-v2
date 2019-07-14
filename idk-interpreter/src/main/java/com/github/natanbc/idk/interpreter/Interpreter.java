@@ -9,6 +9,7 @@ import com.github.natanbc.idk.ir.variable.*;
 import com.github.natanbc.idk.runtime.ExecutionContext;
 import com.github.natanbc.idk.runtime.internal.FunctionState;
 import com.github.natanbc.idk.runtime.Value;
+import com.github.natanbc.idk.runtime.internal.ReturnException;
 
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class Interpreter implements IrVisitor<Value> {
             var state = new FunctionState(globals, node.getLocalsCount());
             return node.getBody().accept(new ActualInterpreter(state));
         } catch(ReturnException e) {
-            return e.ret;
+            return e.getValue();
         }
     }
     

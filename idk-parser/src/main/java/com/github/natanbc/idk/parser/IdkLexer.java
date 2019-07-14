@@ -232,7 +232,7 @@ public class IdkLexer extends Lexer {
                             return new Token(TokenType.DOUBLE, pos, sb.toString());
                         }
                         if(!Character.isDigit(peek(false))) {
-                            unread('.');
+                            backTo(pos().line(), pos().column() - 1);
                             return new Token(TokenType.LONG, pos, sb.toString());
                         }
                         point = true;

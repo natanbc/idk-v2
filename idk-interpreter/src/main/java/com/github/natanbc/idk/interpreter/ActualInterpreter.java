@@ -11,6 +11,7 @@ import com.github.natanbc.idk.ir.value.*;
 import com.github.natanbc.idk.ir.variable.*;
 import com.github.natanbc.idk.runtime.*;
 import com.github.natanbc.idk.runtime.internal.FunctionState;
+import com.github.natanbc.idk.runtime.internal.ReturnException;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -50,7 +51,7 @@ class ActualInterpreter implements IrVisitor<Value> {
             var state = new FunctionState(this.state.getGlobals(), node.getLocalsCount());
             return node.getBody().accept(new ActualInterpreter(state));
         } catch(ReturnException e) {
-            return e.ret;
+            return e.getValue();
         }
     }
     
@@ -188,20 +189,11 @@ class ActualInterpreter implements IrVisitor<Value> {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
                 var s = new FunctionState(state, node.getLocalsCount());
-                var argc = node.getArgumentCount();
-                s.fillFromArgs(args, argc - (node.isVarargs() ? 1 : 0));
-                if(node.isVarargs()) {
-                    var arr = new ArrayValue();
-                    var j = 0;
-                    for(var i = argc - 1; i < args.length; i++) {
-                        arr.set(new LongValue(j++), args[i]);
-                    }
-                    s.setLocal(node.getArgumentCount() - 1, arr);
-                }
+                s.fillFromArgs(args, node.getArgumentCount(), node.isVarargs());
                 try {
                     return node.getBody().accept(new ActualInterpreter(s));
                 } catch(ReturnException e) {
-                    return e.ret;
+                    return e.getValue();
                 }
             }
         };
@@ -257,7 +249,7 @@ class ActualInterpreter implements IrVisitor<Value> {
             }
             return ret;
         }
-        throw new ThrownError(new StringValue("Bad type as for target: " + value.type()));
+        throw new TypeError("Bad type as for target: " + value.type());
     }
     
     @Override

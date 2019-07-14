@@ -2,6 +2,32 @@ plugins {
     id 'java'
 }
 
+def lint = [
+        "auxiliaryclass",
+        "cast",
+        "deprecation",
+        "dep-ann",
+        "divzero",
+        "empty",
+        "exports",
+        "fallthrough",
+        "finally",
+        "-module",
+        "opens",
+        "options",
+        "overloads",
+        "overrides",
+        "path",
+        "rawtypes",
+        "removal",
+        "-requires-transitive-automatic",
+        "static",
+        "try",
+        "unchecked",
+        "varargs",
+        "preview"
+]
+
 allprojects {
     apply plugin: 'java'
 
@@ -10,19 +36,39 @@ allprojects {
 
     sourceCompatibility = 11
 
-
     repositories {
         jcenter()
         mavenCentral()
     }
+
+    compileJava {
+        options.encoding = 'UTF-8'
+        options.incremental = true
+        options.compilerArgs += ["-Xlint:${lint.join(",")}", "-Werror"]
+    }
+}
+
+subprojects {
+    afterEvaluate {
+        compileJava {
+            inputs.property("moduleName", name)
+            doFirst {
+                options.compilerArgs += [
+                        '--module-path', classpath.asPath,
+                ]
+                classpath = files()
+            }
+        }
+    }
 }
 
 dependencies {
-    compile project(':idk-common')
     compile project(':idk-ast')
-    compile project(':idk-parser')
-    compile project(':idk-ir')
-    compile project(':idk-runtime')
+    compile project(':idk-common')
+    compile project(':idk-compiler')
     compile project(':idk-interpreter')
+    compile project(':idk-ir')
+    compile project(':idk-parser')
+    compile project(':idk-runtime')
     compile project(':idk-stdlib')
 }

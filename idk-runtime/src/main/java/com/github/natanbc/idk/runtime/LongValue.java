@@ -80,9 +80,9 @@ public class LongValue implements Value {
     @Override
     public Value mod(Value other) {
         if(other.isLong()) {
-            return new LongValue(value / other.asLong().getValue());
+            return new LongValue(value % other.asLong().getValue());
         } else if(other.isDouble()) {
-            return new DoubleValue(value / other.asDouble().getValue());
+            return new DoubleValue(value % other.asDouble().getValue());
         } else {
             throw Helpers.invalidArithmetic(this, other);
         }
@@ -112,7 +112,7 @@ public class LongValue implements Value {
     }
     
     @Override
-    public BooleanValue greater(Value other) {
+    public Value greater(Value other) {
         if(other.isLong()) {
             return BooleanValue.of(value > other.asLong().getValue());
         } else if(other.isDouble()) {
@@ -123,7 +123,7 @@ public class LongValue implements Value {
     }
     
     @Override
-    public BooleanValue greaterEq(Value other) {
+    public Value greaterEq(Value other) {
         if(other.isLong()) {
             return BooleanValue.of(value >= other.asLong().getValue());
         } else if(other.isDouble()) {
@@ -134,7 +134,7 @@ public class LongValue implements Value {
     }
     
     @Override
-    public BooleanValue smaller(Value other) {
+    public Value smaller(Value other) {
         if(other.isLong()) {
             return BooleanValue.of(value < other.asLong().getValue());
         } else if(other.isDouble()) {
@@ -145,7 +145,7 @@ public class LongValue implements Value {
     }
     
     @Override
-    public BooleanValue smallerEq(Value other) {
+    public Value smallerEq(Value other) {
         if(other.isLong()) {
             return BooleanValue.of(value <= other.asLong().getValue());
         } else if(other.isDouble()) {

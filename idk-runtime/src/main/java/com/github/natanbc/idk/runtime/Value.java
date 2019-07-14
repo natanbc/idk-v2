@@ -104,7 +104,7 @@ public interface Value {
     }
     
     default Value neg() {
-        throw Helpers.typeError(this, "perform arithmetic", null);
+        throw Helpers.typeError(this, "perform arithmetic on", null);
     }
     
     default Value negate() {
@@ -119,19 +119,19 @@ public interface Value {
         return eq(other).negate();
     }
     
-    default BooleanValue greater(Value other) {
+    default Value greater(Value other) {
         throw Helpers.typeError(this, "compare", other);
     }
     
-    default BooleanValue greaterEq(Value other) {
+    default Value greaterEq(Value other) {
         throw Helpers.typeError(this, "compare", other);
     }
     
-    default BooleanValue smaller(Value other) {
+    default Value smaller(Value other) {
         throw Helpers.typeError(this, "compare", other);
     }
     
-    default BooleanValue smallerEq(Value other) {
+    default Value smallerEq(Value other) {
         throw Helpers.typeError(this, "compare", other);
     }
     

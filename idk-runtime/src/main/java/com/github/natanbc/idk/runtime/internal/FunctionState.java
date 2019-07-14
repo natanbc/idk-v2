@@ -1,5 +1,7 @@
 package com.github.natanbc.idk.runtime.internal;
 
+import com.github.natanbc.idk.runtime.ArrayValue;
+import com.github.natanbc.idk.runtime.LongValue;
 import com.github.natanbc.idk.runtime.NilValue;
 import com.github.natanbc.idk.runtime.Value;
 
@@ -24,8 +26,16 @@ public class FunctionState extends BasicExecutionContext {
         Arrays.fill(locals, NilValue.instance());
     }
     
-    public void fillFromArgs(Value[] args, int argCount) {
-        System.arraycopy(args, 0, locals, 0, Math.min(argCount, args.length));
+    public void fillFromArgs(Value[] args, int argCount, boolean varargs) {
+        System.arraycopy(args, 0, locals, 0, Math.min(argCount - (varargs ? 1 : 0), args.length));
+        if(varargs) {
+            var arr = new ArrayValue();
+            var j = 0;
+            for(var i = argCount - 1; i < args.length; i++) {
+                arr.set(new LongValue(j++), args[i]);
+            }
+            locals[argCount - 1] = arr;
+        }
     }
     
     public Value getLocal(int index) {

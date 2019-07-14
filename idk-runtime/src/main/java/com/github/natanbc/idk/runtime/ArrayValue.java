@@ -4,6 +4,7 @@ import com.github.natanbc.idk.runtime.internal.SparseArray;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class ArrayValue implements Value {
     private final SparseArray<Value> array = new SparseArray<>();
@@ -12,12 +13,18 @@ public class ArrayValue implements Value {
     ArrayValue(Collection<? extends Value> values) {
         var i = 0;
         for(var v : values) {
-            array.put(i++, v);
+            array.put(i++, Objects.requireNonNull(v));
         }
     }
     
     public ArrayValue(List<? extends Value> values) {
         this((Collection<? extends Value>)values);
+    }
+    
+    public ArrayValue(Value[] array) {
+        for(var i = 0; i < array.length; i++) {
+            this.array.put(i, Objects.requireNonNull(array[i]));
+        }
     }
     
     public ArrayValue() {}

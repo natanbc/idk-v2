@@ -1,7 +1,7 @@
 package com.github.natanbc.idk.runtime;
 
-public class TypeError extends ExecutionError {
+public class TypeError extends ThrownError {
     public TypeError(String message) {
-        super(message);
+        super(new StringValue(message));
     }
 }

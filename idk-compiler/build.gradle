@@ -1,0 +1,6 @@
+dependencies {
+    compile project(':idk-ir')
+    compile project(':idk-runtime')
+
+    compile 'com.headius:invokebinder:1.11'
+}
