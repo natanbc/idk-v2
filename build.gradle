@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'maven'
     id 'maven-publish'
+    id 'signing'
 }
 
 dependencies {
@@ -47,7 +48,7 @@ allprojects {
 
     sourceCompatibility = 10
     targetCompatibility = 10
-
+    
     repositories {
         jcenter()
         mavenCentral()
@@ -58,9 +59,20 @@ allprojects {
         options.incremental = true
         options.compilerArgs += ["-Xlint:${lint.join(",")}", "-Werror"]
     }
+
+    //gradle is retarded
+    //"Required org.gradle.jvm.version '10' and found incompatible value '12'."
+    java {
+        disableAutoTargetJvm()
+    }
 }
 
+def publishTargets = []
+
 subprojects {
+    apply plugin: 'maven-publish'
+    
+    publishTargets += name
     afterEvaluate {
         javadoc {
             options.addStringOption('-module-path', classpath.asPath)
@@ -87,17 +99,24 @@ subprojects {
         from javadoc.destinationDir
     }
 
-    publishing {
-        publications {
-            "$name"(MavenPublication) {
-                from components.java
-                groupId group
-                artifactId name
+    afterEvaluate {
+        publishing {
+            publications {
+                "$name"(MavenPublication) {
+                    from components.java
+                    groupId group
+                    artifactId name
 
-                artifact sourceJar
-                artifact javadocJar
+                    artifact sourceJar
+                    artifact javadocJar
+                }
             }
+            repositories {
+                maven { url "$buildDir/repo" }
+            }
+        }
+        signing {
+            sign publishing.publications."$name"
         }
     }
 }
-

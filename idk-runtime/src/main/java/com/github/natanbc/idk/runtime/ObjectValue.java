@@ -12,6 +12,10 @@ public class ObjectValue implements Value {
     
     public ObjectValue() {}
     
+    public Map<Value, Value> getMap() {
+        return map;
+    }
+    
     @Override
     public String type() {
         return "object";

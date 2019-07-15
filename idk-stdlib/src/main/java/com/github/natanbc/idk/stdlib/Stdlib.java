@@ -6,6 +6,8 @@ import java.util.List;
 
 public class Stdlib {
     public static void install(ExecutionContext context) {
+        context.setGlobal("math", MathLib.load());
+        
         context.setGlobal("type", new Function("type") {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
@@ -58,7 +60,7 @@ public class Stdlib {
         });
     }
     
-    private static Value get(Value[] args, int index) {
+    static Value get(Value[] args, int index) {
         if(args.length <= index) {
             throw new ThrownError(new StringValue("Missing argument " + index));
         }
