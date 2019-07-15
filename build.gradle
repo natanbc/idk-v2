@@ -1,5 +1,16 @@
 plugins {
-    id 'java'
+    id 'java-library'
+}
+
+dependencies {
+    api project(':idk-ast')
+    api project(':idk-common')
+    api project(':idk-compiler')
+    api project(':idk-interpreter')
+    api project(':idk-ir')
+    api project(':idk-parser')
+    api project(':idk-runtime')
+    api project(':idk-stdlib')
 }
 
 def lint = [
@@ -29,12 +40,11 @@ def lint = [
 ]
 
 allprojects {
-    apply plugin: 'java'
-
-    group 'com.github.natanbc'
+    group 'com.github.natanbc.idk'
     version '1.0-SNAPSHOT'
 
-    sourceCompatibility = 11
+    sourceCompatibility = 10
+    targetCompatibility = 10
 
     repositories {
         jcenter()
@@ -62,13 +72,3 @@ subprojects {
     }
 }
 
-dependencies {
-    compile project(':idk-ast')
-    compile project(':idk-common')
-    compile project(':idk-compiler')
-    compile project(':idk-interpreter')
-    compile project(':idk-ir')
-    compile project(':idk-parser')
-    compile project(':idk-runtime')
-    compile project(':idk-stdlib')
-}

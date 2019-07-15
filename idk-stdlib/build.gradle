@@ -1,3 +1,5 @@
+apply plugin: 'java-library'
+
 dependencies {
-    compile project(':idk-runtime')
+    api project(':idk-runtime')
 }

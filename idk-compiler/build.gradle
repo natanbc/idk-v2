@@ -1,6 +1,8 @@
-dependencies {
-    compile project(':idk-ir')
-    compile project(':idk-runtime')
+apply plugin: 'java-library'
 
-    compile 'com.headius:invokebinder:1.11'
+dependencies {
+    api project(':idk-ir')
+    api project(':idk-runtime')
+
+    implementation 'com.headius:invokebinder:1.11'
 }

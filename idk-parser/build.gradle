@@ -1,5 +1,7 @@
+apply plugin: 'java-library'
+
 dependencies {
-    compile project(':idk-common')
-    compile project(':idk-ast')
-    compile 'com.github.natanbc:pratt-parser:1.4.0'
+    api project(':idk-common')
+    api project(':idk-ast')
+    api 'com.github.natanbc:pratt-parser:1.4.0'
 }
