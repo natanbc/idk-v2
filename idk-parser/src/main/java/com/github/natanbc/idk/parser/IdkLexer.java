@@ -22,6 +22,9 @@ public class IdkLexer extends Lexer {
         int ch = read(true);
         switch(ch) {
             case -1: return new Token(TokenType.EOF, pos(), "<EOF>");
+            
+            case ';': return new Token(TokenType.SEMICOLON, pos(), ";");
+            
             case '"': return readString(pos(), '"');
             case '\'': return readString(pos(), '\'');
             
