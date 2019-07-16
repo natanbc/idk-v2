@@ -183,7 +183,7 @@ public class LongValue implements Value {
         static {
             CACHE = new LongValue[256];
             for(int i = 0; i < 256; i++) {
-                CACHE[i] = of(i);
+                CACHE[i] = new LongValue(i);
             }
         }
     }
