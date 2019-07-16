@@ -58,21 +58,21 @@ public class MathLib {
         function("tanh", Math::tanh);
         function("ulp", Math::ulp);
         
-        LIB.set(new StringValue("abs"), new Function("abs") {
+        LIB.set(StringValue.of("abs"), new Function("abs") {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
                 var v = Stdlib.get(args, 0);
                 if(v.isDouble()) {
-                    return new DoubleValue(Math.abs(v.asDouble().getValue()));
+                    return DoubleValue.of(Math.abs(v.asDouble().getValue()));
                 } else if(v.isLong()) {
-                    return new LongValue(Math.abs(v.asLong().getValue()));
+                    return LongValue.of(Math.abs(v.asLong().getValue()));
                 } else {
                     throw new TypeError("Expected argument to be long or double");
                 }
             }
         });
         
-        LIB.set(new StringValue("parseLong"), new Function("parseLong") {
+        LIB.set(StringValue.of("parseLong"), new Function("parseLong") {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
                 var s = Stdlib.get(args, 0).asString().getValue();
@@ -85,19 +85,19 @@ public class MathLib {
                     base = (int)arg2;
                 }
                 try {
-                    return new LongValue(Long.parseLong(s, base));
+                    return LongValue.of(Long.parseLong(s, base));
                 } catch(NumberFormatException e) {
                     return NilValue.instance();
                 }
             }
         });
         
-        LIB.set(new StringValue("parseDouble"), new Function("parseDouble") {
+        LIB.set(StringValue.of("parseDouble"), new Function("parseDouble") {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
                 var s = Stdlib.get(args, 0).asString().getValue();
                 try {
-                    return new DoubleValue(Double.parseDouble(s));
+                    return DoubleValue.of(Double.parseDouble(s));
                 } catch(NumberFormatException e) {
                     return NilValue.instance();
                 }
@@ -110,51 +110,51 @@ public class MathLib {
     }
     
     private static void constant(String name, double value) {
-        LIB.set(new StringValue(name), new DoubleValue(value));
+        LIB.set(StringValue.of(name), DoubleValue.of(value));
     }
     
     private static void constant(String name, long value) {
-        LIB.set(new StringValue(name), new LongValue(value));
+        LIB.set(StringValue.of(name), LongValue.of(value));
     }
     
     private static void function(String name, DoubleSupplier operator) {
-        LIB.set(new StringValue(name), new Function(name) {
+        LIB.set(StringValue.of(name), new Function(name) {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
-                return new DoubleValue(operator.getAsDouble());
+                return DoubleValue.of(operator.getAsDouble());
             }
         });
     }
     
     private static void function(String name, DoubleUnaryOperator operator) {
-        LIB.set(new StringValue(name), new Function(name) {
+        LIB.set(StringValue.of(name), new Function(name) {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
                 var v = Stdlib.get(args, 0);
-                return new DoubleValue(operator.applyAsDouble(toDouble(v)));
+                return DoubleValue.of(operator.applyAsDouble(toDouble(v)));
             }
         });
     }
     
     private static void function(String name, DoubleBinaryOperator operator) {
-        LIB.set(new StringValue(name), new Function(name) {
+        LIB.set(StringValue.of(name), new Function(name) {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
                 var v = Stdlib.get(args, 0);
                 var v2 = Stdlib.get(args, 1);
-                return new DoubleValue(operator.applyAsDouble(toDouble(v), toDouble(v2)));
+                return DoubleValue.of(operator.applyAsDouble(toDouble(v), toDouble(v2)));
             }
         });
     }
     
     private static void function(String name, DoubleTernaryOperator operator) {
-        LIB.set(new StringValue(name), new Function(name) {
+        LIB.set(StringValue.of(name), new Function(name) {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
                 var v = Stdlib.get(args, 0);
                 var v2 = Stdlib.get(args, 1);
                 var v3 = Stdlib.get(args, 2);
-                return new DoubleValue(operator.applyAsDouble(toDouble(v), toDouble(v2), toDouble(v3)));
+                return DoubleValue.of(operator.applyAsDouble(toDouble(v), toDouble(v2), toDouble(v3)));
             }
         });
     }

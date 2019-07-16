@@ -3,7 +3,7 @@ package com.github.natanbc.idk.runtime;
 public class NilValue implements Value {
     private static final NilValue INSTANCE = new NilValue();
     
-    private final StringValue string = new StringValue("nil");
+    private final StringValue string = StringValue.of("nil");
     
     private NilValue() {}
     
@@ -34,7 +34,7 @@ public class NilValue implements Value {
     @Override
     public Value add(Value other) {
         if(other.isString()) {
-            return new StringValue("nil" + other.asString().getValue());
+            return StringValue.of("nil" + other.asString().getValue());
         }
         throw Helpers.invalidArithmetic(this, other);
     }

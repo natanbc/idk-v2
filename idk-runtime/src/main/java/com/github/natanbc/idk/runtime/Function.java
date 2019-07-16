@@ -33,7 +33,7 @@ public abstract class Function implements Value {
     
     @Override
     public StringValue tostring() {
-        return new StringValue(toString());
+        return StringValue.of(toString());
     }
     
     @Override
@@ -56,12 +56,12 @@ public abstract class Function implements Value {
     
     @Override
     public Value set(Value key, Value value) {
-        throw new ThrownError(new StringValue("Functions are immutable"));
+        throw new ThrownError(StringValue.of("Functions are immutable"));
     }
     
     @Override
     public ArrayValue keys() {
-        return new ArrayValue(Collections.singletonList(new StringValue("annotations")));
+        return new ArrayValue(Collections.singletonList(StringValue.of("annotations")));
     }
     
     @Override

@@ -51,7 +51,7 @@ public class ArrayValue implements Value {
     
     @Override
     public StringValue tostring() {
-        return new StringValue("array 0x" + Integer.toHexString(System.identityHashCode(this)));
+        return StringValue.of("array 0x" + Integer.toHexString(System.identityHashCode(this)));
     }
     
     @Override

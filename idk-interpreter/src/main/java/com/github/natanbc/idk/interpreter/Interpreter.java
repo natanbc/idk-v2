@@ -86,14 +86,14 @@ public class Interpreter implements IrVisitor<Value> {
     public Value visitDouble(IrDouble node) {
         checkValid();
         var replaced = findReplacement(node);
-        return replaced.orElseGet(() -> filterValue(node, new DoubleValue(node.getValue())));
+        return replaced.orElseGet(() -> filterValue(node, DoubleValue.of(node.getValue())));
     }
     
     @Override
     public Value visitLong(IrLong node) {
         checkValid();
         var replaced = findReplacement(node);
-        return replaced.orElseGet(() -> filterValue(node, new LongValue(node.getValue())));
+        return replaced.orElseGet(() -> filterValue(node, LongValue.of(node.getValue())));
     }
     
     @Override
@@ -107,7 +107,7 @@ public class Interpreter implements IrVisitor<Value> {
     public Value visitString(IrString node) {
         checkValid();
         var replaced = findReplacement(node);
-        return replaced.orElseGet(() -> filterValue(node, new StringValue(node.getValue())));
+        return replaced.orElseGet(() -> filterValue(node, StringValue.of(node.getValue())));
     }
     
     @Override
@@ -161,7 +161,7 @@ public class Interpreter implements IrVisitor<Value> {
     public Value visitRange(IrRange node) {
         checkValid();
         var replaced = findReplacement(node);
-        return replaced.orElseGet(() -> filterValue(node, new RangeValue(
+        return replaced.orElseGet(() -> filterValue(node, RangeValue.of(
                 node.getFrom().accept(this).asLong().getValue(),
                 node.getTo().accept(this).asLong().getValue()
         )));
@@ -257,7 +257,7 @@ public class Interpreter implements IrVisitor<Value> {
         }
         var annotationList = new ArrayList<StringValue>();
         for(String annotation : node.getAnnotations()) {
-            annotationList.add(new StringValue(annotation));
+            annotationList.add(StringValue.of(annotation));
         }
         var fn = new Function(node.getName(), annotationList) {
             @Override
@@ -330,7 +330,7 @@ public class Interpreter implements IrVisitor<Value> {
             Value ret = NilValue.instance();
             var end = range.getTo() + step;
             for(var l = range.getFrom(); l != end; l += step) {
-                state().setLocal(node.getVariableIndex(), new LongValue(l));
+                state().setLocal(node.getVariableIndex(), LongValue.of(l));
                 ret = node.getBody().accept(this);
             }
             return filterValue(node, ret);

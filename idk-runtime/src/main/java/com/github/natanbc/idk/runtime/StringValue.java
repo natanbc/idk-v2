@@ -5,8 +5,12 @@ import java.util.Objects;
 public class StringValue implements Value {
     private final String value;
     
-    public StringValue(String value) {
+    private StringValue(String value) {
         this.value = Objects.requireNonNull(value);
+    }
+    
+    public static StringValue of(String value) {
+        return new StringValue(value);
     }
     
     public String getValue() {
@@ -35,7 +39,7 @@ public class StringValue implements Value {
     
     @Override
     public Value add(Value other) {
-        return new StringValue(value + other.tostring().asString().getValue());
+        return of(value + other.tostring().asString().getValue());
     }
     
     @Override
@@ -44,7 +48,7 @@ public class StringValue implements Value {
         if(v < 0 || v > Integer.MAX_VALUE) {
             throw new RangeError("Value out of range");
         }
-        return new StringValue(value.repeat((int)v));
+        return of(value.repeat((int)v));
     }
     
     @Override
@@ -92,7 +96,7 @@ public class StringValue implements Value {
             } else if(idx >= value.length()) {
                 return NilValue.instance();
             } else {
-                return new StringValue(String.valueOf(value.charAt((int)idx)));
+                return of(String.valueOf(value.charAt((int)idx)));
             }
         } else {
             throw Helpers.typeError(this, "access non integer field of", null);

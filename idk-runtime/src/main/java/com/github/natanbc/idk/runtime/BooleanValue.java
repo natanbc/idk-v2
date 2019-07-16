@@ -9,7 +9,7 @@ public class BooleanValue implements Value {
     
     private BooleanValue(boolean value) {
         this.value = value;
-        this.string = new StringValue(String.valueOf(value));
+        this.string = StringValue.of(String.valueOf(value));
     }
     
     public static BooleanValue of(boolean value) {
@@ -43,7 +43,7 @@ public class BooleanValue implements Value {
     @Override
     public Value add(Value other) {
         if(other.isString()) {
-            return new StringValue(value + other.asString().getValue());
+            return StringValue.of(value + other.asString().getValue());
         }
         throw Helpers.invalidArithmetic(this, other);
     }

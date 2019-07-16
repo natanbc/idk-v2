@@ -23,7 +23,7 @@ public class ObjectValue implements Value {
     
     @Override
     public StringValue tostring() {
-        return new StringValue("object 0x" + Integer.toHexString(System.identityHashCode(this)));
+        return StringValue.of("object 0x" + Integer.toHexString(System.identityHashCode(this)));
     }
     
     @Override

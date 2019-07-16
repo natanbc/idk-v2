@@ -11,7 +11,7 @@ public class Stdlib {
         context.setGlobal("type", new Function("type") {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
-                return new StringValue(Stdlib.get(args, 0).type());
+                return StringValue.of(Stdlib.get(args, 0).type());
             }
         });
         
@@ -25,7 +25,7 @@ public class Stdlib {
         context.setGlobal("size", new Function("size") {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
-                return new LongValue(Stdlib.get(args, 0).size());
+                return LongValue.of(Stdlib.get(args, 0).size());
             }
         });
         
@@ -49,7 +49,7 @@ public class Stdlib {
                         if(e.getMessage() != null) {
                             msg += ": " + e.getMessage();
                         }
-                        errorMessage = new StringValue(msg);
+                        errorMessage = StringValue.of(msg);
                     }
                     return new ArrayValue(List.of(
                             BooleanValue.of(false),
@@ -62,7 +62,7 @@ public class Stdlib {
     
     static Value get(Value[] args, int index) {
         if(args.length <= index) {
-            throw new ThrownError(new StringValue("Missing argument " + index));
+            throw new ThrownError(StringValue.of("Missing argument " + index));
         }
         return args[index];
     }

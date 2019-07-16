@@ -3,8 +3,12 @@ package com.github.natanbc.idk.runtime;
 public class LongValue implements Value {
     private final long value;
     
-    public LongValue(long value) {
+    private LongValue(long value) {
         this.value = value;
+    }
+    
+    public static LongValue of(long value) {
+        return new LongValue(value);
     }
     
     public long getValue() {
@@ -18,7 +22,7 @@ public class LongValue implements Value {
     
     @Override
     public StringValue tostring() {
-        return new StringValue(String.valueOf(value));
+        return StringValue.of(String.valueOf(value));
     }
     
     @Override
@@ -34,11 +38,11 @@ public class LongValue implements Value {
     @Override
     public Value add(Value other) {
         if(other.isString()) {
-            return new StringValue(value + other.asString().getValue());
+            return StringValue.of(value + other.asString().getValue());
         } else if(other.isLong()) {
-            return new LongValue(value + other.asLong().getValue());
+            return of(value + other.asLong().getValue());
         } else if(other.isDouble()) {
-            return new DoubleValue(value + other.asDouble().getValue());
+            return DoubleValue.of(value + other.asDouble().getValue());
         } else {
             throw Helpers.invalidArithmetic(this, other);
         }
@@ -47,9 +51,9 @@ public class LongValue implements Value {
     @Override
     public Value sub(Value other) {
         if(other.isLong()) {
-            return new LongValue(value - other.asLong().getValue());
+            return of(value - other.asLong().getValue());
         } else if(other.isDouble()) {
-            return new DoubleValue(value - other.asDouble().getValue());
+            return DoubleValue.of(value - other.asDouble().getValue());
         } else {
             throw Helpers.invalidArithmetic(this, other);
         }
@@ -58,9 +62,9 @@ public class LongValue implements Value {
     @Override
     public Value mul(Value other) {
         if(other.isLong()) {
-            return new LongValue(value * other.asLong().getValue());
+            return of(value * other.asLong().getValue());
         } else if(other.isDouble()) {
-            return new DoubleValue(value * other.asDouble().getValue());
+            return DoubleValue.of(value * other.asDouble().getValue());
         } else {
             throw Helpers.invalidArithmetic(this, other);
         }
@@ -69,9 +73,9 @@ public class LongValue implements Value {
     @Override
     public Value div(Value other) {
         if(other.isLong()) {
-            return new LongValue(value / other.asLong().getValue());
+            return of(value / other.asLong().getValue());
         } else if(other.isDouble()) {
-            return new DoubleValue(value / other.asDouble().getValue());
+            return DoubleValue.of(value / other.asDouble().getValue());
         } else {
             throw Helpers.invalidArithmetic(this, other);
         }
@@ -80,9 +84,9 @@ public class LongValue implements Value {
     @Override
     public Value mod(Value other) {
         if(other.isLong()) {
-            return new LongValue(value % other.asLong().getValue());
+            return of(value % other.asLong().getValue());
         } else if(other.isDouble()) {
-            return new DoubleValue(value % other.asDouble().getValue());
+            return DoubleValue.of(value % other.asDouble().getValue());
         } else {
             throw Helpers.invalidArithmetic(this, other);
         }
@@ -91,9 +95,9 @@ public class LongValue implements Value {
     @Override
     public Value pow(Value other) {
         if(other.isLong()) {
-            return new LongValue((long)Math.pow(value, other.asLong().getValue()));
+            return of((long)Math.pow(value, other.asLong().getValue()));
         } else if(other.isDouble()) {
-            return new DoubleValue(Math.pow(value, other.asDouble().getValue()));
+            return DoubleValue.of(Math.pow(value, other.asDouble().getValue()));
         } else {
             throw Helpers.invalidArithmetic(this, other);
         }
@@ -101,7 +105,7 @@ public class LongValue implements Value {
     
     @Override
     public Value neg() {
-        return new LongValue(-value);
+        return of(-value);
     }
     
     @Override

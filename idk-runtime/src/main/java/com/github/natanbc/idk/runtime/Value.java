@@ -4,7 +4,7 @@ public interface Value {
     String type();
     
     default StringValue tostring() {
-        return new StringValue(toString());
+        return StringValue.of(toString());
     }
     
     default boolean isBoolean() {

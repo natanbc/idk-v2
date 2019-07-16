@@ -84,7 +84,7 @@ public class Intrinsics {
     public static final MethodHandle IS_LONG = typeCheck("Long");
     public static final MethodHandle AS_LONG = typeConversion(LongValue.class, "Long");
     public static final MethodHandle LONG_VALUE = valueGetter(LongValue.class, long.class);
-    public static final MethodHandle NEW_LONG = findConstructor(LongValue.class, methodType(long.class));
+    public static final MethodHandle NEW_LONG = findStatic(LongValue.class, "of", methodType(LongValue.class, long.class));
     
     public static final MethodHandle IS_NIL = typeCheck("Nil");
     public static final MethodHandle AS_NIL = typeConversion(NilValue.class, "Nil");
@@ -97,7 +97,7 @@ public class Intrinsics {
     public static final MethodHandle AS_RANGE = typeConversion(RangeValue.class, "Range");
     public static final MethodHandle RANGE_FROM = find(RangeValue.class, "getFrom", methodType(long.class));
     public static final MethodHandle RANGE_TO = find(RangeValue.class, "getTo", methodType(long.class));
-    public static final MethodHandle NEW_RANGE = findConstructor(RangeValue.class, methodType(long.class, long.class));
+    public static final MethodHandle NEW_RANGE = findStatic(RangeValue.class, "of", methodType(RangeValue.class, long.class, long.class));
     
     public static final MethodHandle IS_STRING = typeCheck("String");
     public static final MethodHandle AS_STRING = typeConversion(StringValue.class, "String");

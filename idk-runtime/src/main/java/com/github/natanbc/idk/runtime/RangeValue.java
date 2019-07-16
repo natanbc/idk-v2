@@ -6,9 +6,13 @@ public class RangeValue implements Value {
     private final long from;
     private final long to;
     
-    public RangeValue(long from, long to) {
+    private RangeValue(long from, long to) {
         this.from = from;
         this.to = to;
+    }
+    
+    public static RangeValue of(long from, long to) {
+        return new RangeValue(from, to);
     }
     
     public long getFrom() {
@@ -38,8 +42,8 @@ public class RangeValue implements Value {
     public Value get(Value key) {
         if(key.isString()) {
             switch(key.asString().getValue()) {
-                case "from": return new LongValue(from);
-                case "to": return new LongValue(to);
+                case "from": return LongValue.of(from);
+                case "to": return LongValue.of(to);
             }
         }
         return NilValue.instance();
@@ -47,7 +51,7 @@ public class RangeValue implements Value {
     
     @Override
     public Value set(Value key, Value value) {
-        throw new ThrownError(new StringValue("Ranges are immutable"));
+        throw new ThrownError(StringValue.of("Ranges are immutable"));
     }
     
     @Override
@@ -58,8 +62,8 @@ public class RangeValue implements Value {
     @Override
     public ArrayValue keys() {
         return new ArrayValue(List.of(
-                new StringValue("from"),
-                new StringValue("to")
+                StringValue.of("from"),
+                StringValue.of("to")
         ));
     }
     

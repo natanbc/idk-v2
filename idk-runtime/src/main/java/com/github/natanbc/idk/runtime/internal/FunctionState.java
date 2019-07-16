@@ -32,7 +32,7 @@ public class FunctionState extends BasicExecutionContext {
             var arr = new ArrayValue();
             var j = 0;
             for(var i = argCount - 1; i < args.length; i++) {
-                arr.set(new LongValue(j++), args[i]);
+                arr.set(LongValue.of(j++), args[i]);
             }
             locals[argCount - 1] = arr;
         }

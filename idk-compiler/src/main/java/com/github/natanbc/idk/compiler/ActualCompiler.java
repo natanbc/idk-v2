@@ -56,12 +56,12 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
     
     @Override
     public MethodHandle visitDouble(IrDouble node) {
-        return constant(new DoubleValue(node.getValue()));
+        return constant(DoubleValue.of(node.getValue()));
     }
     
     @Override
     public MethodHandle visitLong(IrLong node) {
-        return constant(new LongValue(node.getValue()));
+        return constant(LongValue.of(node.getValue()));
     }
     
     @Override
@@ -71,7 +71,7 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
     
     @Override
     public MethodHandle visitString(IrString node) {
-        return constant(new StringValue(node.getValue()));
+        return constant(StringValue.of(node.getValue()));
     }
     
     @Override
@@ -167,7 +167,7 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
     @Override
     public MethodHandle visitRange(IrRange node) {
         if(node.getFrom() instanceof IrLong && node.getTo() instanceof IrLong) {
-            return constant(new RangeValue(
+            return constant(RangeValue.of(
                     ((IrLong) node.getFrom()).getValue(), ((IrLong) node.getTo()).getValue()
             ));
         }
@@ -358,7 +358,7 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
     
         List<StringValue> annotationList = new ArrayList<>();
         for(String annotation : node.getAnnotations()) {
-            annotationList.add(new StringValue(annotation));
+            annotationList.add(StringValue.of(annotation));
         }
         
         var createFunction = base()
