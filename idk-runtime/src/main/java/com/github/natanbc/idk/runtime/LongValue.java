@@ -8,6 +8,9 @@ public class LongValue implements Value {
     }
     
     public static LongValue of(long value) {
+        if(value >= 0 && value < 256) {
+            return LongCache.CACHE[(int)value];
+        }
         return new LongValue(value);
     }
     
@@ -172,5 +175,16 @@ public class LongValue implements Value {
     @Override
     public String toString() {
         return String.valueOf(value);
+    }
+    
+    private static class LongCache {
+        static final LongValue[] CACHE;
+        
+        static {
+            CACHE = new LongValue[256];
+            for(int i = 0; i < 256; i++) {
+                CACHE[i] = of(i);
+            }
+        }
     }
 }
