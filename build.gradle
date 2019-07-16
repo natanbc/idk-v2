@@ -5,6 +5,8 @@ plugins {
     id 'signing'
 }
 
+def versionObj = new Version(major: 0, minor: 2, revision: 0)
+
 dependencies {
     api project(':idk-ast')
     api project(':idk-common')
@@ -44,7 +46,7 @@ def lint = [
 
 allprojects {
     group 'com.github.natanbc.idk'
-    version '1.0-SNAPSHOT'
+    version versionObj.toString()
 
     sourceCompatibility = 10
     targetCompatibility = 10
@@ -117,6 +119,18 @@ subprojects {
         }
         signing {
             sign publishing.publications."$name"
+        }
+    }
+}
+
+class Version {
+    String major, minor, revision
+
+    String toString() {
+        if(revision == null || revision == "0") {
+            return "$major.$minor"
+        } else {
+            return "$major.$minor.$revision"
         }
     }
 }
