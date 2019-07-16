@@ -7,18 +7,24 @@ import java.util.List;
 import java.util.Objects;
 
 public class AstFunction implements AstNode {
+    private final boolean local;
     private final String name;
     private final List<String> arguments;
     private final AstNode body;
     private final boolean varargs;
     private final List<String> annotations;
     
-    public AstFunction(String name, List<String> arguments, AstNode body, boolean varargs, List<String> annotations) {
+    public AstFunction(boolean local, String name, List<String> arguments, AstNode body, boolean varargs, List<String> annotations) {
+        this.local = local;
         this.name = name;
         this.arguments = arguments;
         this.body = body;
         this.varargs = varargs;
         this.annotations = annotations;
+    }
+    
+    public boolean isLocal() {
+        return local;
     }
     
     public String getName() {
@@ -48,7 +54,8 @@ public class AstFunction implements AstNode {
     
     @Override
     public int hashCode() {
-        return Objects.hashCode(name) ^ arguments.hashCode() ^ body.hashCode() ^ Boolean.hashCode(varargs) ^ annotations.hashCode();
+        return Boolean.hashCode(local) ^ Objects.hashCode(name) ^ arguments.hashCode()
+                ^ body.hashCode() ^ Boolean.hashCode(varargs) ^ annotations.hashCode();
     }
     
     @Override
@@ -57,12 +64,12 @@ public class AstFunction implements AstNode {
             return false;
         }
         var o = (AstFunction)obj;
-        return Objects.equals(o.name, name) && o.arguments.equals(arguments) && o.body.equals(body)
-                && o.varargs == varargs && o.annotations.equals(annotations);
+        return o.local == local && Objects.equals(o.name, name) && o.arguments.equals(arguments)
+                && o.body.equals(body) && o.varargs == varargs && o.annotations.equals(annotations);
     }
     
     @Override
     public String toString() {
-        return "Function(" + name + ", " + arguments + ", " + body + ", " + varargs + ", " + annotations + ")";
+        return "Function(" + (local ? "local" : "non local") + ", " + name + ", " + arguments + ", " + body + ", " + varargs + ", " + annotations + ")";
     }
 }

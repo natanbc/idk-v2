@@ -361,7 +361,7 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
             annotationList.add(StringValue.of(annotation));
         }
         
-        var createFunction = base()
+        return base()
                 //-> [state, name]
                 .append(String.class, node.getName()) //name may be null so getting the type fails
                 //-> [state, name, annotations, code]
@@ -370,20 +370,6 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
                 .permute(1, 2, 3, 0)
                 .cast(methodType(Value.class, String.class, List.class, MethodHandle.class, FunctionState.class))
                 .invoke(Intrinsics.NEW_FUNCTION);
-        
-        if(node.getName() != null) {
-            return base()
-                    .fold(createFunction)
-                    .permute(1, 0)
-                    .foldVoid(MethodHandles.insertArguments(
-                            Intrinsics.SET_GLOBAL,
-                            1, node.getName()
-                    ))
-                    .drop(0)
-                    .identity();
-        }
-        
-        return createFunction;
     }
     
     @Override

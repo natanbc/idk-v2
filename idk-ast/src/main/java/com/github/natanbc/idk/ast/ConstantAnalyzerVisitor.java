@@ -115,7 +115,7 @@ public class ConstantAnalyzerVisitor implements AstVisitor<Boolean> {
     
     @Override
     public Boolean visitFunction(AstFunction node) {
-        return node.getName() == null;
+        return node.isLocal() || node.getName() == null;
     }
     
     @Override

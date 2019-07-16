@@ -172,6 +172,7 @@ public class SimplifierVisitor implements AstVisitor<AstNode> {
     @Override
     public AstNode visitFunction(AstFunction node) {
         return new AstFunction(
+                node.isLocal(),
                 node.getName(),
                 node.getArguments(),
                 node.getBody().accept(SIMPLIFY_INTERNAL),

@@ -169,14 +169,23 @@ class ActualIrConverter implements AstVisitor<IrNode> {
             newScope.declareLocal(argument);
         }
         var ir = node.getBody().accept(new ActualIrConverter(newScope));
-        return new IrFunction(
-                node.getName(),
+        var name = node.getName();
+        var fn = new IrFunction(
+                name,
                 node.getArguments().size(),
                 newScope.localsCount(),
                 ir,
                 node.isVarargs(),
                 node.getAnnotations()
         );
+        if(name != null) {
+            if(node.isLocal()) {
+                return new IrAssign(scope.declareLocal(name), fn);
+            } else {
+                return new IrAssign(new IrGlobal(name), fn);
+            }
+        }
+        return fn;
     }
     
     @Override

@@ -215,6 +215,7 @@ public class IdkLexer extends Lexer {
             //case "await": return new Token(TokenType.AWAIT, pos, "await");
             case "for": return new Token(TokenType.FOR, pos, "for");
             case "in": return new Token(TokenType.IN, pos, "in");
+            case "local": return new Token(TokenType.LOCAL, pos, "local");
             
             default: return new Token(TokenType.IDENTIFIER, pos, res);
         }

@@ -277,9 +277,6 @@ public class Interpreter implements IrVisitor<Value> {
                 }
             }
         };
-        if(node.getName() != null) {
-            state().setGlobal(node.getName(), fn);
-        }
         return filterValue(node, fn);
     }
     

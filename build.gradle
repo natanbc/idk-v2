@@ -5,7 +5,7 @@ plugins {
     id 'signing'
 }
 
-def versionObj = new Version(major: 0, minor: 3, revision: 0)
+def versionObj = new Version(major: 0, minor: 4, revision: 0)
 
 dependencies {
     api project(':idk-ast')

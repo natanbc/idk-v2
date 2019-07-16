@@ -218,46 +218,8 @@ public class IdkParselets {
                     return new AstFor(variable, value, body, new AstBody(Collections.emptyList()));
                 }
             }),
-            Map.entry(TokenType.FUNCTION, (context, parser, __1) -> {
-                var annotations = new ArrayList<String>();
-                if(parser.matches(TokenType.LEFT_BRACKET)) {
-                    do {
-                        annotations.add(parser.consume(TokenType.IDENTIFIER).value());
-                    } while(parser.matches(TokenType.COMMA));
-                    parser.expect(TokenType.RIGHT_BRACKET);
-                }
-                var name = parser.peek().kind() == TokenType.IDENTIFIER ? parser.consume(TokenType.IDENTIFIER).value() : null;
-                parser.expect(TokenType.LEFT_PAREN);
-                var args = new ArrayList<String>();
-                var varargs = false;
-                if(!parser.matches(TokenType.RIGHT_PAREN)) {
-                    do {
-                        if(varargs) {
-                            throw new SyntaxException("No arguments may be declared after a varargs one:\n" +
-                                    parser.lexer().prettyContextFor(parser.peek()));
-                        }
-                        if(parser.matches(TokenType.VARARGS)) {
-                            varargs = true;
-                        }
-                        var argName = parser.consume(TokenType.IDENTIFIER);
-                        if(args.contains(argName.value())) {
-                            throw new SyntaxException("Argument " + argName.value() + " already exists:\n" +
-                                    parser.lexer().prettyContextFor(argName));
-                        }
-                        args.add(argName.value());
-                    } while(parser.matches(TokenType.COMMA));
-                    parser.expect(TokenType.RIGHT_PAREN);
-                }
-                var body = parseBody(context, parser);
-                
-                return new AstFunction(
-                        name,
-                        args,
-                        body,
-                        varargs,
-                        annotations
-                );
-            })
+            Map.entry(TokenType.FUNCTION, new FunctionParselet(false)),
+            Map.entry(TokenType.LOCAL, new LocalParselet())
     );
     
     private static AstNode parseBody(Void context, Parser<Void, AstNode> parser) {
@@ -309,6 +271,69 @@ public class IdkParselets {
         @Override
         public AstNode parse(Void context, @Nonnull Parser<Void, AstNode> parser, @Nonnull Token token) {
             return nodeBuilder.apply(parser.parseExpression(context, Precedence.PREFIX));
+        }
+    }
+    
+    private static class FunctionParselet implements PrefixParselet<Void, AstNode> {
+        private final boolean local;
+    
+        private FunctionParselet(boolean local) {
+            this.local = local;
+        }
+    
+        @CheckReturnValue
+        @Nonnull
+        @Override
+        public AstNode parse(Void context, @Nonnull Parser<Void, AstNode> parser, @Nonnull Token token) {
+            var annotations = new ArrayList<String>();
+            if(parser.matches(TokenType.LEFT_BRACKET)) {
+                do {
+                    annotations.add(parser.consume(TokenType.IDENTIFIER).value());
+                } while(parser.matches(TokenType.COMMA));
+                parser.expect(TokenType.RIGHT_BRACKET);
+            }
+            var name = parser.peek().kind() == TokenType.IDENTIFIER ? parser.consume(TokenType.IDENTIFIER).value() : null;
+            parser.expect(TokenType.LEFT_PAREN);
+            var args = new ArrayList<String>();
+            var varargs = false;
+            if(!parser.matches(TokenType.RIGHT_PAREN)) {
+                do {
+                    if(varargs) {
+                        throw new SyntaxException("No arguments may be declared after a varargs one:\n" +
+                                parser.lexer().prettyContextFor(parser.peek()));
+                    }
+                    if(parser.matches(TokenType.VARARGS)) {
+                        varargs = true;
+                    }
+                    var argName = parser.consume(TokenType.IDENTIFIER);
+                    if(args.contains(argName.value())) {
+                        throw new SyntaxException("Argument " + argName.value() + " already exists:\n" +
+                                parser.lexer().prettyContextFor(argName));
+                    }
+                    args.add(argName.value());
+                } while(parser.matches(TokenType.COMMA));
+                parser.expect(TokenType.RIGHT_PAREN);
+            }
+            var body = parseBody(context, parser);
+    
+            return new AstFunction(
+                    local, name,
+                    args,
+                    body,
+                    varargs,
+                    annotations
+            );
+        }
+    }
+    
+    private static class LocalParselet implements PrefixParselet<Void, AstNode> {
+        private final FunctionParselet functionParselet = new FunctionParselet(true);
+        
+        @CheckReturnValue
+        @Nonnull
+        @Override
+        public AstNode parse(Void context, @Nonnull Parser<Void, AstNode> parser, @Nonnull Token token) {
+            return functionParselet.parse(context, parser, parser.consume(TokenType.FUNCTION));
         }
     }
 }
