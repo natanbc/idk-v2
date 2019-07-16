@@ -106,7 +106,7 @@ public class Intrinsics {
     public static final MethodHandle NEW_THROWN_ERROR = findConstructor(ThrownError.class, methodType(Value.class));
     
     public static final MethodHandle CALCULATE_STEP = findStatic(Intrinsics.class, "step", methodType(long.class, long.class, long.class));
-    public static final MethodHandle RANGE_ITERATION_DONE = findStatic(Intrinsics.class, "done", methodType(boolean.class, long.class, long.class));
+    public static final MethodHandle LONGS_DIFFER = findStatic(Intrinsics.class, "longsDiffer", methodType(boolean.class, long.class, long.class));
     public static final MethodHandle RANGE_ITERATION_END = findStatic(Intrinsics.class, "end", methodType(long.class, long.class, long.class));
     public static final MethodHandle ADD_LONGS = findStatic(Intrinsics.class, "add", methodType(long.class, long.class, long.class));
     
@@ -204,7 +204,7 @@ public class Intrinsics {
         return from > to ? -1 : +1;
     }
     
-    private static boolean done(long i, long to) {
+    private static boolean longsDiffer(long i, long to) {
         return i != to;
     }
     

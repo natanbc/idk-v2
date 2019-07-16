@@ -212,7 +212,11 @@ public class IdkParselets {
                 var value = parser.parseExpression(context);
                 parser.expect(TokenType.RIGHT_PAREN);
                 var body = parseBody(context, parser);
-                return new AstFor(variable, value, body);
+                if(parser.matches(TokenType.ELSE)) {
+                    return new AstFor(variable, value, body, parseBody(context, parser));
+                } else {
+                    return new AstFor(variable, value, body, new AstBody(Collections.emptyList()));
+                }
             }),
             Map.entry(TokenType.FUNCTION, (context, parser, __1) -> {
                 var annotations = new ArrayList<String>();

@@ -415,15 +415,17 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
     public MethodHandle visitFor(IrFor node) {
         var value = node.getValue().accept(this);
         var body = node.getBody().accept(this);
+        var elseBody = node.getElseBody().accept(this);
         return base()
                 .fold(value)
                 .invoke(
                         MethodHandles.guardWithTest(
                                 Intrinsics.IS_RANGE,
+                                //ranges are always closed on both ends so the else body never runs
                                 forRange(node.getVariableIndex(), body),
                                 MethodHandles.guardWithTest(
                                         Intrinsics.IS_ARRAY,
-                                        forArray(node.getVariableIndex(), body),
+                                        forArray(node.getVariableIndex(), body, elseBody),
                                         Binder.from(methodType(Value.class, Value.class, FunctionState.class))
                                                 //-> [type, value, state]
                                                 .fold(Intrinsics.TYPE)
@@ -490,7 +492,7 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
                                 //-> [i, end]
                                 .permute(2, 0)
                                 //-> [done]
-                                .invoke(Intrinsics.RANGE_ITERATION_DONE),
+                                .invoke(Intrinsics.LONGS_DIFFER),
                         Binder.from(methodType(Value.class, long.class, Value.class))
                                 .drop(0)
                                 .identity()
@@ -541,7 +543,37 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
                 .invoke(loop);
     }
     
-    private static MethodHandle forArray(int localIdx, MethodHandle body) {
+    private static MethodHandle forArray(int localIdx, MethodHandle body, MethodHandle elseBody) {
+        var loop = MethodHandles.countedLoop(
+                Binder.from(methodType(int.class, long.class, ArrayValue.class, FunctionState.class))
+                        //-> [size]
+                        .drop(1, 2)
+                        .cast(methodType(int.class, long.class))
+                        .identity(),
+                Binder.from(methodType(Value.class, long.class, ArrayValue.class, FunctionState.class))
+                        .dropAll()
+                        .constant(NilValue.instance()),
+                Binder.from(methodType(Value.class, Value.class, int.class, long.class, ArrayValue.class, FunctionState.class))
+                        //-> [array, index, state]
+                        .permute(3, 1, 4)
+                        //-> [value, array, index, state]
+                        .fold(Intrinsics.ARRAY_RAW_GET)
+                        //-> [state, value]
+                        .permute(3, 0)
+                        .foldVoid(Binder.from(methodType(Value.class, FunctionState.class, Value.class))
+                                //-> [state, value, index]
+                                .append(localIdx)
+                                //-> [state, index, value]
+                                .permute(0, 2, 1)
+                                //-> [value]
+                                .invoke(Intrinsics.SET_LOCAL)
+                        )
+                        //-> [state]
+                        .drop(1)
+                        //-> [value]
+                        .invoke(body)
+        );
+        
         return Binder.from(methodType(Value.class, Value.class, FunctionState.class))
                 //-> [array, value, state]
                 .fold(Intrinsics.AS_ARRAY)
@@ -552,36 +584,20 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
                 //-> [size, array, state]
                 .drop(1)
                 //-> [result]
-                .invoke(
-                        MethodHandles.countedLoop(
-                                Binder.from(methodType(int.class, long.class, ArrayValue.class, FunctionState.class))
-                                        //-> [size]
-                                        .drop(1, 2)
-                                        .cast(methodType(int.class, long.class))
-                                        .identity(),
-                                Binder.from(methodType(Value.class, long.class, ArrayValue.class, FunctionState.class))
-                                        .dropAll()
-                                        .constant(NilValue.instance()),
-                                Binder.from(methodType(Value.class, Value.class, int.class, long.class, ArrayValue.class, FunctionState.class))
-                                        //-> [array, index, state]
-                                        .permute(3, 1, 4)
-                                        //-> [value, array, index, state]
-                                        .fold(Intrinsics.ARRAY_RAW_GET)
-                                        //-> [state, value]
-                                        .permute(3, 0)
-                                        .foldVoid(Binder.from(methodType(Value.class, FunctionState.class, Value.class))
-                                                //-> [state, value, index]
-                                                .append(localIdx)
-                                                //-> [state, index, value]
-                                                .permute(0, 2, 1)
-                                                //-> [value]
-                                                .invoke(Intrinsics.SET_LOCAL)
-                                        )
-                                        //-> [state]
-                                        .drop(1)
-                                        //-> [value]
-                                        .invoke(body)
-                        )
+                .branch(
+                        Binder.from(methodType(boolean.class, long.class, ArrayValue.class, FunctionState.class))
+                                //-> [size]
+                                .drop(1, 2)
+                                //-> [size, 0]
+                                .append(0L)
+                                //-> [not empty]
+                                .invoke(Intrinsics.LONGS_DIFFER),
+                        loop,
+                        Binder.from(methodType(Value.class, long.class, ArrayValue.class, FunctionState.class))
+                                //-> [state]
+                                .drop(0, 2)
+                                //-> [result]
+                                .invoke(elseBody)
                 );
     }
     

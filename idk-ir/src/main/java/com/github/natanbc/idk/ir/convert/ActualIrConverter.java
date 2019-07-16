@@ -227,13 +227,15 @@ class ActualIrConverter implements AstVisitor<IrNode> {
             return new IrFor(
                     loadNode.getIndex(),
                     node.getValue().accept(innerScope()),
-                    node.getBody().accept(innerScope())
+                    node.getBody().accept(innerScope()),
+                    node.getElseBody().accept(innerScope())
             );
         } else {
             return new IrFor(
                     loadNode.getIndex(),
                     node.getValue().accept(innerScope()),
-                    new IrBody(List.of(setup, node.getBody().accept(innerScope())))
+                    new IrBody(List.of(setup, node.getBody().accept(innerScope()))),
+                    node.getElseBody().accept(innerScope())
             );
         }
     }

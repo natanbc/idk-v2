@@ -7,11 +7,13 @@ public class IrFor implements IrNode {
     private final int variableIndex;
     private final IrNode value;
     private final IrNode body;
+    private final IrNode elseBody;
     
-    public IrFor(int variableIndex, IrNode value, IrNode body) {
+    public IrFor(int variableIndex, IrNode value, IrNode body, IrNode elseBody) {
         this.variableIndex = variableIndex;
         this.value = value;
         this.body = body;
+        this.elseBody = elseBody;
     }
     
     public int getVariableIndex() {
@@ -26,6 +28,10 @@ public class IrFor implements IrNode {
         return body;
     }
     
+    public IrNode getElseBody() {
+        return elseBody;
+    }
+    
     @Override
     public <T> T accept(IrVisitor<T> visitor) {
         return visitor.visitFor(this);
@@ -33,7 +39,7 @@ public class IrFor implements IrNode {
     
     @Override
     public int hashCode() {
-        return variableIndex ^ value.hashCode() ^ body.hashCode();
+        return variableIndex ^ value.hashCode() ^ body.hashCode() ^ elseBody.hashCode();
     }
     
     @Override
@@ -42,11 +48,11 @@ public class IrFor implements IrNode {
             return false;
         }
         var o = (IrFor)obj;
-        return o.variableIndex == variableIndex && o.value.equals(value) && o.body.equals(body);
+        return o.variableIndex == variableIndex && o.value.equals(value) && o.body.equals(body) && o.elseBody.equals(elseBody);
     }
     
     @Override
     public String toString() {
-        return "For(" + variableIndex + ", " + value + ", " + body + ")";
+        return "For(" + variableIndex + ", " + value + ", " + body + ", " + elseBody + ")";
     }
 }

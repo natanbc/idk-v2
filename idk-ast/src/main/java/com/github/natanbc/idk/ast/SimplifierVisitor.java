@@ -223,7 +223,8 @@ public class SimplifierVisitor implements AstVisitor<AstNode> {
         return new AstFor(
                 node.getVariable(),
                 node.getValue().accept(SIMPLIFY_INTERNAL),
-                node.getBody().accept(SIMPLIFY_INTERNAL)
+                node.getBody().accept(SIMPLIFY_INTERNAL),
+                node.getElseBody().accept(SIMPLIFY_INTERNAL)
         );
     }
     

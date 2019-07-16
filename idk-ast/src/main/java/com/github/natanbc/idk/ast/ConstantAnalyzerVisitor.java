@@ -130,7 +130,10 @@ public class ConstantAnalyzerVisitor implements AstVisitor<Boolean> {
     
     @Override
     public Boolean visitFor(AstFor node) {
-        return node.getValue().accept(this) && node.getBody().accept(this);
+        //variable might be a pattern with a side effect on creation
+        //not that doing that would be a good practice but oh well
+        return node.getVariable().accept(this) && node.getValue().accept(this)
+                && node.getBody().accept(this) && node.getElseBody().accept(this);
     }
     
     @Override

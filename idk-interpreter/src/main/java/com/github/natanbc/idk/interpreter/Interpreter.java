@@ -324,6 +324,7 @@ public class Interpreter implements IrVisitor<Value> {
             return replaced.get();
         }
         var value = node.getValue().accept(this);
+        //ranges are always closed on both ends so the else body never runs
         if(value.isRange()) {
             var range = value.asRange();
             var step = range.getFrom() > range.getTo() ? -1 : 1;
@@ -337,6 +338,9 @@ public class Interpreter implements IrVisitor<Value> {
         }
         if(value.isArray()) {
             var array = value.asArray();
+            if(array.size() == 0) {
+                return filterValue(node, node.getElseBody().accept(this));
+            }
             Value ret = NilValue.instance();
             for(var i = 0; i < array.size(); i++) {
                 state().setLocal(node.getVariableIndex(), array.rawGet(i));
