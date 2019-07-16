@@ -228,8 +228,17 @@ public class IdkParselets {
             return new AstBody(Collections.emptyList());
         } else {
             var list = new ArrayList<AstNode>();
+            var last = parser.lexer().pos();
+            var needsSemicolon = false;
             do {
+                if(parser.peek().position().line() == last.line() && needsSemicolon && !dropSemicolons(parser)) {
+                    throw new SyntaxException("Semicolon required between multiple expressions on the same line:\n"
+                            + parser.lexer().prettyContext(parser.peek().position(), 1)
+                    );
+                }
+                last = parser.peek().position();
                 list.add(parser.parseExpression(context));
+                needsSemicolon = !dropSemicolons(parser);
             } while(leftBrace && !parser.matches(TokenType.RIGHT_BRACE));
             return new AstBody(list);
         }
@@ -335,5 +344,13 @@ public class IdkParselets {
         public AstNode parse(Void context, @Nonnull Parser<Void, AstNode> parser, @Nonnull Token token) {
             return functionParselet.parse(context, parser, parser.consume(TokenType.FUNCTION));
         }
+    }
+    
+    private static boolean dropSemicolons(Parser<Void, AstNode> parser) {
+        var found = false;
+        while(parser.matches(TokenType.SEMICOLON)) {
+            found = true;
+        }
+        return found;
     }
 }

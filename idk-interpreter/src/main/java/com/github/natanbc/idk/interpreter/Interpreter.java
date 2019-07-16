@@ -14,7 +14,9 @@ import com.github.natanbc.idk.runtime.internal.FunctionState;
 import com.github.natanbc.idk.runtime.internal.ReturnException;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public class Interpreter implements IrVisitor<Value> {
@@ -36,6 +38,11 @@ public class Interpreter implements IrVisitor<Value> {
             Map.entry(BinaryOperationType.GREATER_EQ, Value::greaterEq),
             Map.entry(BinaryOperationType.SMALLER, Value::smaller),
             Map.entry(BinaryOperationType.SMALLER_EQ, Value::smallerEq)
+    );
+    
+    private static final Map<BinaryOperationType, BiFunction<Value, Supplier<Value>, Value>> SHORT_CIRCUITING_OPERATORS = Map.of(
+            BinaryOperationType.AND, (lhs, rhs) -> BooleanValue.of(lhs.asBoolean().getValue() && rhs.get().asBoolean().getValue()),
+            BinaryOperationType.OR, (lhs, rhs) -> BooleanValue.of(lhs.asBoolean().getValue() || rhs.get().asBoolean().getValue())
     );
     
     private final ArrayDeque<FunctionState> states = new ArrayDeque<>();
@@ -151,10 +158,23 @@ public class Interpreter implements IrVisitor<Value> {
     public Value visitBinaryOperation(IrBinaryOperation node) {
         checkValid();
         var replaced = findReplacement(node);
-        return replaced.orElseGet(() -> filterValue(node, BINARY_OPERATORS.get(node.getType()).apply(
-                node.getLhs().accept(this),
-                node.getRhs().accept(this)
-        )));
+        return replaced.orElseGet(() -> {
+            var binary = BINARY_OPERATORS.get(node.getType());
+            if(binary != null) {
+                return filterValue(node, binary.apply(
+                        node.getLhs().accept(this),
+                        node.getRhs().accept(this)
+                ));
+            }
+            var shortCircuiting = SHORT_CIRCUITING_OPERATORS.get(node.getType());
+            if(shortCircuiting != null) {
+                return filterValue(node, shortCircuiting.apply(
+                        node.getLhs().accept(this),
+                        () -> node.getRhs().accept(this)
+                ));
+            }
+            throw new UnsupportedOperationException("Unimplemented operator " + node.getType());
+        });
     }
     
     @Override
@@ -259,10 +279,13 @@ public class Interpreter implements IrVisitor<Value> {
         for(String annotation : node.getAnnotations()) {
             annotationList.add(StringValue.of(annotation));
         }
+        //store current state instead of getting whatever's stored when the function is called,
+        //which will most likely be a wrong state
+        var state = state();
         var fn = new Function(node.getName(), annotationList) {
             @Override
             public Value call(ExecutionContext context, Value[] args) {
-                var s = new FunctionState(state(), node.getLocalsCount());
+                var s = new FunctionState(state, node.getLocalsCount());
                 s.fillFromArgs(args, node.getArgumentCount(), node.isVarargs());
                 states.push(s);
                 try {

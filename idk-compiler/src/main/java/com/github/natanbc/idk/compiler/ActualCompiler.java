@@ -1,5 +1,6 @@
 package com.github.natanbc.idk.compiler;
 
+import com.github.natanbc.idk.common.BinaryOperationType;
 import com.github.natanbc.idk.ir.IrNode;
 import com.github.natanbc.idk.ir.IrVisitor;
 import com.github.natanbc.idk.ir.misc.*;
@@ -151,6 +152,29 @@ class ActualCompiler implements IrVisitor<MethodHandle> {
     
     @Override
     public MethodHandle visitBinaryOperation(IrBinaryOperation node) {
+        //special case for short circuiting
+        if(node.getType() == BinaryOperationType.AND || node.getType() == BinaryOperationType.OR) {
+            var lhsAsBoolean = Binder.from(methodType(boolean.class, FunctionState.class))
+                    .filterReturn(Intrinsics.BOOLEAN_VALUE)
+                    .filterReturn(Intrinsics.AS_BOOLEAN)
+                    .invoke(node.getLhs().accept(this));
+            var rhsAsBoolean = Binder.from(methodType(Value.class, FunctionState.class))
+                    .filterReturn(Intrinsics.AS_BOOLEAN)
+                    .invoke(node.getRhs().accept(this));
+            if(node.getType() == BinaryOperationType.AND) {
+                return base().branch(
+                        lhsAsBoolean,
+                        rhsAsBoolean,
+                        constant(BooleanValue.of(false))
+                );
+            } else {
+                return base().branch(
+                        lhsAsBoolean,
+                        constant(BooleanValue.of(true)),
+                        rhsAsBoolean
+                );
+            }
+        }
         return base()
                 //-> [lhs, state]
                 .fold(node.getLhs().accept(this))
