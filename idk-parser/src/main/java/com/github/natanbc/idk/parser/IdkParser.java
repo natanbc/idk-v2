@@ -30,17 +30,22 @@ public class IdkParser extends Parser<Void, AstNode> {
     public AstNode parse() {
         var list = new ArrayList<AstNode>();
         while(!matches(TokenType.EOF)) {
-            while(true) {
-                if(!matches(TokenType.SEMICOLON)) {
-                    break;
-                }
-            }
+            dropSemicolons();
             list.add(parseExpression(null));
+            dropSemicolons();
         }
         if(list.size() == 1) {
             return list.get(0);
         } else {
             return new AstBody(list);
+        }
+    }
+    
+    private void dropSemicolons() {
+        while(true) {
+            if(!matches(TokenType.SEMICOLON)) {
+                break;
+            }
         }
     }
 }
