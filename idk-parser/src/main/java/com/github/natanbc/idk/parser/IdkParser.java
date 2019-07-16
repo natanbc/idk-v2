@@ -5,8 +5,6 @@ import com.github.natanbc.idk.ast.misc.AstBody;
 import com.github.natanbc.pratt.Lexer;
 import com.github.natanbc.pratt.Parser;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.io.Reader;
 import java.io.StringReader;
@@ -29,10 +27,17 @@ public class IdkParser extends Parser<Void, AstNode> {
     
     public AstNode parse() {
         var list = new ArrayList<AstNode>();
+        var needsSemicolon = false;
+        var last = lexer.pos();
         while(!matches(TokenType.EOF)) {
-            dropSemicolons();
+            if(peek().position().line() == last.line() && needsSemicolon && !dropSemicolons()) {
+                throw new SyntaxException("Semicolon required between multiple expressions on the same line:\n"
+                        + lexer.prettyContext(peek().position(), 1)
+                );
+            }
+            last = peek().position();
             list.add(parseExpression(null));
-            dropSemicolons();
+            needsSemicolon = !dropSemicolons();
         }
         if(list.size() == 1) {
             return list.get(0);
@@ -41,11 +46,11 @@ public class IdkParser extends Parser<Void, AstNode> {
         }
     }
     
-    private void dropSemicolons() {
-        while(true) {
-            if(!matches(TokenType.SEMICOLON)) {
-                break;
-            }
+    private boolean dropSemicolons() {
+        var found = false;
+        while(matches(TokenType.SEMICOLON)) {
+            found = true;
         }
+        return found;
     }
 }
