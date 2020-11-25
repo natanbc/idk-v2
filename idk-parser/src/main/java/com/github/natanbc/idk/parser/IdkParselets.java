@@ -168,7 +168,7 @@ public class IdkParselets {
                                 l.add(Map.entry(new AstString(k), parser.parseExpression(context)));
                             }
                         }
-                    } while(parser.matches(TokenType.COMMA));
+                    } while(parser.matches(TokenType.COMMA) && parser.peek().kind() != TokenType.RIGHT_BRACE);
                     parser.expect(TokenType.RIGHT_BRACE);
                 }
                 return new AstObjectLiteral(l);
@@ -178,7 +178,7 @@ public class IdkParselets {
                 if(!parser.matches(TokenType.RIGHT_BRACKET)) {
                     do {
                         l.add(parser.parseExpression(context));
-                    } while(parser.matches(TokenType.COMMA));
+                    } while(parser.matches(TokenType.COMMA) && parser.peek().kind() != TokenType.RIGHT_BRACKET);
                     parser.expect(TokenType.RIGHT_BRACKET);
                 }
                 return new AstArrayLiteral(l);
