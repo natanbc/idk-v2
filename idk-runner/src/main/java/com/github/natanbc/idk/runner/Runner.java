@@ -85,39 +85,43 @@ public class Runner {
     }
     
     private static void executeCode(String code) {
-        var ast = new IdkParser(code).parse();
-        debug("AST (parsed): %s", ast);
-        if(simplify) {
-            ast = ast.accept(SimplifierVisitor.instance());
-            debug("AST (simplified): %s", ast);
-        }
-        var ir = ast.accept(IrConverter.instance());
-        debug("IR: %s", ir);
-        if(bytecode) {
-            var bc = ir.accept(BytecodeConverter.instance());
-            if(debug) {
-                var br = new BytecodeReader(bc);
-                while(true) {
-                    var fr = br.readFunction();
-                    if(fr == null) break;
-                    debug("  id: %d", fr.id() & 0xFFFF);
-                    debug("  name: %s%s", fr.name(), fr.id() == br.entrypoint() ? " (entrypoint)" : "");
-                    debug("  arg count: %d", fr.argumentCount());
-                    debug("  locals count: %d", fr.localsCount());
-                    debug("  varargs: %s", fr.varargs());
-                    debug("  annotations: %s", fr.annotations());
-                    var codeStart = fr.reader().pos();
+        try {
+            var ast = new IdkParser(code).parse();
+            debug("AST (parsed): %s", ast);
+            if(simplify) {
+                ast = ast.accept(SimplifierVisitor.instance());
+                debug("AST (simplified): %s", ast);
+            }
+            var ir = ast.accept(IrConverter.instance());
+            debug("IR: %s", ir);
+            if(bytecode) {
+                var bc = ir.accept(BytecodeConverter.instance());
+                if(debug) {
+                    var br = new BytecodeReader(bc);
                     while(true) {
-                        var pos = fr.reader().pos() - codeStart;
-                        var op = fr.nextInstruction();
-                        if(op == null) break;
-                        debug("    %s: %s", pos, op);
+                        var fr = br.readFunction();
+                        if(fr == null) break;
+                        debug("  id: %d", fr.id() & 0xFFFF);
+                        debug("  name: %s%s", fr.name(), fr.id() == br.entrypoint() ? " (entrypoint)" : "");
+                        debug("  arg count: %d", fr.argumentCount());
+                        debug("  locals count: %d", fr.localsCount());
+                        debug("  varargs: %s", fr.varargs());
+                        debug("  annotations: %s", fr.annotations());
+                        var codeStart = fr.reader().pos();
+                        while(true) {
+                            var pos = fr.reader().pos() - codeStart;
+                            var op = fr.nextInstruction();
+                            if(op == null) break;
+                            debug("    %s: %s", pos, op);
+                        }
                     }
                 }
+                execute(() -> new BytecodeInterpreter(bc, context.getGlobals()).run());
+            } else {
+                execute(() -> ir.accept(new Interpreter(context)));
             }
-            execute(() -> new BytecodeInterpreter(bc, context.getGlobals()).run());
-        } else {
-            execute(() -> ir.accept(new Interpreter(context)));
+        } catch(Exception e) {
+            print("Error: %s", e);
         }
     }
     

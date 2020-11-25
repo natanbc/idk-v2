@@ -1,5 +1,7 @@
 package com.github.natanbc.idk.runtime.internal;
 
+import java.util.Iterator;
+
 public class SparseArray<T> {
     private static final Object DELETED = new Object();
     private static final int DEFAULT_CAPACITY = 10;
@@ -22,6 +24,35 @@ public class SparseArray<T> {
             keys = new int[values.length];
         }
         size = 0;
+    }
+    
+    public Iterator<T> iterator() {
+        return new Iterator<>() {
+            private int idx = 0;
+            
+            @Override
+            public boolean hasNext() {
+                while(idx < size && values[idx] == DELETED) {
+                    idx++;
+                }
+                return idx < size;
+            }
+    
+            @Override
+            @SuppressWarnings("unchecked")
+            public T next() {
+                return (T)values[idx++];
+            }
+        };
+    }
+    
+    public SparseArray<T> copy() {
+        var ret = new SparseArray<T>(size);
+        System.arraycopy(keys, 0, ret.keys, 0, keys.length);
+        System.arraycopy(values, 0, ret.values, 0, values.length);
+        ret.size = size;
+        ret.garbage = garbage;
+        return ret;
     }
     
     public T get(int key) {

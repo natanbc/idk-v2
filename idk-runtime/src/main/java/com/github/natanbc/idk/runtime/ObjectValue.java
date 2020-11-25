@@ -4,13 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ObjectValue implements Value {
-    private final Map<Value, Value> map = new HashMap<>();
+    private Map<Value, Value> map = new HashMap<>();
+    private boolean cow;
     
     public ObjectValue(Map<Value, Value> map) {
         this.map.putAll(map);
     }
     
     public ObjectValue() {}
+    
+    public ObjectValue copyOnWrite() {
+        cow = true;
+        return this;
+    }
     
     public Map<Value, Value> getMap() {
         return map;
@@ -43,6 +49,10 @@ public class ObjectValue implements Value {
     
     @Override
     public Value set(Value key, Value value) {
+        if(cow) {
+            map = new HashMap<>(map);
+            cow = false;
+        }
         map.put(key, value);
         return value;
     }

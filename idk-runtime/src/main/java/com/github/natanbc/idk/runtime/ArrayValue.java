@@ -3,14 +3,16 @@ package com.github.natanbc.idk.runtime;
 import com.github.natanbc.idk.runtime.internal.SparseArray;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-public class ArrayValue implements Value {
-    private final SparseArray<Value> array = new SparseArray<>();
+public class ArrayValue implements Value, Iterable<Value> {
+    private SparseArray<Value> array;
+    private boolean cow;
     
-    //used for the key set on ObjectValue
-    ArrayValue(Collection<? extends Value> values) {
+    public ArrayValue(Collection<? extends Value> values) {
+        this.array = new SparseArray<>(values.size());
         var i = 0;
         for(var v : values) {
             array.put(i++, Objects.requireNonNull(v));
@@ -22,12 +24,20 @@ public class ArrayValue implements Value {
     }
     
     public ArrayValue(Value[] array) {
+        this.array = new SparseArray<>(array.length);
         for(var i = 0; i < array.length; i++) {
             this.array.put(i, Objects.requireNonNull(array[i]));
         }
     }
     
-    public ArrayValue() {}
+    public ArrayValue() {
+        this.array = new SparseArray<>();
+    }
+    
+    public ArrayValue copyOnWrite() {
+        cow = true;
+        return this;
+    }
     
     public Value rawGet(int index) {
         if(index < 0) {
@@ -40,8 +50,14 @@ public class ArrayValue implements Value {
         if(index < 0) {
             throw new RangeError("Negative index");
         }
+        checkWrite();
         array.put(index, value);
         return value;
+    }
+    
+    @Override
+    public Iterator<Value> iterator() {
+        return array.iterator();
     }
     
     @Override
@@ -71,7 +87,9 @@ public class ArrayValue implements Value {
     
     @Override
     public Value set(Value key, Value value) {
-        array.put(index(key), value);
+        var i = index(key);
+        checkWrite();
+        array.put(i, value);
         return value;
     }
     
@@ -93,6 +111,13 @@ public class ArrayValue implements Value {
     @Override
     public String toString() {
         return "Array(" + array + ")";
+    }
+    
+    private void checkWrite() {
+        if(cow) {
+            array = array.copy();
+            cow = false;
+        }
     }
     
     private int index(Value key) {

@@ -3,6 +3,10 @@ package com.github.natanbc.idk.stdlib;
 import com.github.natanbc.idk.runtime.*;
 
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.LongStream;
+import java.util.stream.StreamSupport;
 
 public class Stdlib {
     public static void install(ExecutionContext context) {
@@ -56,6 +60,41 @@ public class Stdlib {
                             errorMessage
                     ));
                 }
+            }
+        });
+        
+        context.setGlobal("iter", new Function() {
+            @Override
+            public Value call(Value[] args) {
+                var target = Stdlib.get(args, 0);
+                if(target.isArray()) {
+                    var arr = target.asArray().copyOnWrite();
+                    return new IteratorValue(
+                            StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                                    arr.iterator(),
+                                    Spliterator.ORDERED | Spliterator.NONNULL | Spliterator.IMMUTABLE
+                            ), false)
+                    );
+                } else if(target.isObject()) {
+                    var obj = target.asObject().copyOnWrite();
+                    var type = args.length > 1 ?
+                                       args[1].asString().getValue()
+                                       : "entries";
+                    return new IteratorValue(switch(type) {
+                        case "keys" -> obj.getMap().keySet().stream();
+                        case "values" -> obj.getMap().values().stream();
+                        case "entries" -> obj.getMap().entrySet().stream()
+                                                  .map(e -> new ArrayValue(new Value[] { e.getKey(), e.getValue() }));
+                        default -> throw new ThrownError(StringValue.of("Invalid iteration type '" + type + "'"));
+                    });
+                } else if(target.isRange()) {
+                    var range = target.asRange();
+                    return new IteratorValue(
+                            LongStream.rangeClosed(range.getFrom(), range.getTo())
+                                .mapToObj(LongValue::of)
+                    );
+                }
+                throw new ThrownError(StringValue.of("Unable to iterate " + target.type()));
             }
         });
     }
