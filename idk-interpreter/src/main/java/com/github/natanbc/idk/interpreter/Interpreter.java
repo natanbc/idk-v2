@@ -265,7 +265,7 @@ public class Interpreter implements IrVisitor<Value> {
         for(var arg : node.getArguments()) {
             args[i++] = arg.accept(this);
         }
-        return filterValue(node, target.asFunction().call(state(), args));
+        return filterValue(node, target.asFunction().call(args));
     }
     
     @Override
@@ -284,7 +284,7 @@ public class Interpreter implements IrVisitor<Value> {
         var state = state();
         var fn = new Function(node.getName(), annotationList) {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 var s = new FunctionState(state, node.getLocalsCount());
                 s.fillFromArgs(args, node.getArgumentCount(), node.isVarargs());
                 states.push(s);

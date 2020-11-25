@@ -24,7 +24,7 @@ public abstract class Function implements Value {
         this(null, null);
     }
     
-    public abstract Value call(ExecutionContext context, Value[] args);
+    public abstract Value call(Value[] args);
     
     @Override
     public String type() {

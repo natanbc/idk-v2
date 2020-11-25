@@ -10,35 +10,35 @@ public class Stdlib {
         
         context.setGlobal("type", new Function("type") {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 return StringValue.of(Stdlib.get(args, 0).type());
             }
         });
         
         context.setGlobal("keys", new Function("keys") {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 return Stdlib.get(args, 0).keys();
             }
         });
     
         context.setGlobal("size", new Function("size") {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 return LongValue.of(Stdlib.get(args, 0).size());
             }
         });
         
         context.setGlobal("pcall", new Function("pcall") {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 var fn = Stdlib.get(args, 0).asFunction();
                 var fArgs = new Value[args.length - 1];
                 System.arraycopy(args, 1, fArgs, 0, fArgs.length);
                 try {
                     return new ArrayValue(List.of(
                             BooleanValue.of(true),
-                            fn.call(context, fArgs)
+                            fn.call(fArgs)
                     ));
                 } catch(ExecutionError e) {
                     Value errorMessage;

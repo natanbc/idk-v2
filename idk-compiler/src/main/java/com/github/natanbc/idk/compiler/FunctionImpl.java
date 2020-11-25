@@ -21,7 +21,7 @@ class FunctionImpl extends Function {
     }
     
     @Override
-    public Value call(ExecutionContext context, Value[] args) {
+    public Value call(Value[] args) {
         try {
             return (Value)target.invoke(state, args);
         } catch(ReturnException e) {

@@ -60,7 +60,7 @@ public class MathLib {
         
         LIB.set(StringValue.of("abs"), new Function("abs") {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 var v = Stdlib.get(args, 0);
                 if(v.isDouble()) {
                     return DoubleValue.of(Math.abs(v.asDouble().getValue()));
@@ -74,7 +74,7 @@ public class MathLib {
         
         LIB.set(StringValue.of("parseLong"), new Function("parseLong") {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 var s = Stdlib.get(args, 0).asString().getValue();
                 var base = 10;
                 if(args.length > 1) {
@@ -94,7 +94,7 @@ public class MathLib {
         
         LIB.set(StringValue.of("parseDouble"), new Function("parseDouble") {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 var s = Stdlib.get(args, 0).asString().getValue();
                 try {
                     return DoubleValue.of(Double.parseDouble(s));
@@ -120,7 +120,7 @@ public class MathLib {
     private static void function(String name, DoubleSupplier operator) {
         LIB.set(StringValue.of(name), new Function(name) {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 return DoubleValue.of(operator.getAsDouble());
             }
         });
@@ -129,7 +129,7 @@ public class MathLib {
     private static void function(String name, DoubleUnaryOperator operator) {
         LIB.set(StringValue.of(name), new Function(name) {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 var v = Stdlib.get(args, 0);
                 return DoubleValue.of(operator.applyAsDouble(toDouble(v)));
             }
@@ -139,7 +139,7 @@ public class MathLib {
     private static void function(String name, DoubleBinaryOperator operator) {
         LIB.set(StringValue.of(name), new Function(name) {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 var v = Stdlib.get(args, 0);
                 var v2 = Stdlib.get(args, 1);
                 return DoubleValue.of(operator.applyAsDouble(toDouble(v), toDouble(v2)));
@@ -150,7 +150,7 @@ public class MathLib {
     private static void function(String name, DoubleTernaryOperator operator) {
         LIB.set(StringValue.of(name), new Function(name) {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 var v = Stdlib.get(args, 0);
                 var v2 = Stdlib.get(args, 1);
                 var v3 = Stdlib.get(args, 2);

@@ -168,7 +168,7 @@ public class Runner {
         Stdlib.install(context);
         context.setGlobal("print", new Function() {
             @Override
-            public Value call(ExecutionContext context, Value[] args) {
+            public Value call(Value[] args) {
                 for(var s : args) {
                     System.out.print(s.tostring().getValue());
                 }

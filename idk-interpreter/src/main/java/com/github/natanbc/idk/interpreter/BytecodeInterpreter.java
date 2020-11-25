@@ -161,7 +161,7 @@ public class BytecodeInterpreter {
                     for(var i = argc - 1; i >= 0; i--) {
                         args[i] = stack.pop();
                     }
-                    stack.push(stack.pop().asFunction().call(state, args));
+                    stack.push(stack.pop().asFunction().call(args));
                 }
                 case RETURN -> ip = function.code.capacity();
                 case BINARY_OPERATION -> {
@@ -201,7 +201,7 @@ public class BytecodeInterpreter {
                             .stream().map(StringValue::of).collect(Collectors.toList());
                     var fn = new com.github.natanbc.idk.runtime.Function(m.metadata.name(), annotations) {
                         @Override
-                        public Value call(ExecutionContext context, Value[] args) {
+                        public Value call(Value[] args) {
                             var fnInt = new FunctionInterpreter(interpreter, m, state);
                             fnInt.state.fillFromArgs(args, m.metadata.argumentCount(), m.metadata.varargs());
                             while(!fnInt.isDone()) {
