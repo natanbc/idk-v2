@@ -7,4 +7,6 @@ include 'idk-runtime'
 include 'idk-interpreter'
 include 'idk-stdlib'
 include 'idk-compiler'
+include 'idk-bytecode'
+include 'idk-runner'
 

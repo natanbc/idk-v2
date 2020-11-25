@@ -2,6 +2,4 @@ apply plugin: 'java-library'
 
 dependencies {
     api project(':idk-ir')
-    api project(':idk-bytecode')
-    api project(':idk-runtime')
 }

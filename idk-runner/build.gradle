@@ -1,0 +1,13 @@
+apply plugin: 'java-library'
+
+dependencies {
+    api project(':idk-ast')
+    api project(':idk-bytecode')
+    api project(':idk-common')
+    api project(':idk-compiler')
+    api project(':idk-interpreter')
+    api project(':idk-ir')
+    api project(':idk-parser')
+    api project(':idk-runtime')
+    api project(':idk-stdlib')
+}

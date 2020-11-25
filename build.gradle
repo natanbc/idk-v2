@@ -8,14 +8,7 @@ plugins {
 def versionObj = new Version(major: 0, minor: 5, revision: 1)
 
 dependencies {
-    api project(':idk-ast')
-    api project(':idk-common')
-    api project(':idk-compiler')
-    api project(':idk-interpreter')
-    api project(':idk-ir')
-    api project(':idk-parser')
-    api project(':idk-runtime')
-    api project(':idk-stdlib')
+    api project(':idk-runner')
 }
 
 def lint = [
@@ -48,12 +41,13 @@ allprojects {
     group 'com.github.natanbc.idk'
     version versionObj.toString()
 
-    sourceCompatibility = 10
-    targetCompatibility = 10
+    sourceCompatibility = 15
+    targetCompatibility = 15
     
     repositories {
         jcenter()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 
     compileJava {
