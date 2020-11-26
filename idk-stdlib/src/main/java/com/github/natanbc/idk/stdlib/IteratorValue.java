@@ -59,14 +59,7 @@ public class IteratorValue implements Value {
                                 }
                                 return 1;
                             }
-                            var cmp = fn.apply(va, vb).asLong().getValue();
-                            if(cmp < 0) {
-                                return -1;
-                            } else if(cmp == 0) {
-                                return 0;
-                            } else {
-                                return 1;
-                            }
+                            return Long.signum(fn.apply(va, vb).asLong().getValue());
                         })
                 );
             }),
